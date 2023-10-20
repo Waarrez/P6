@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title "Snowtricks | Inscription" %}
+
+{% block body %}
+
+    <div class="container mt-5 text-center col-md-3">
+        <div>
+            <h2>Inscription</h2>
+        </div>
+        <div>
+            {{ form_start(registerForm, {'attr' : {'class' : 'mt-5'}}) }}
+            <label class="mt-3">Nom d'utilisateur :  </label>
+            {{ form_row(registerForm.username, {'attr' : {'class' : 'form-control mt-3'}}) }}
+            <label class="mt-3">Adresse Mail :  </label>
+            {{ form_row(registerForm.email, {'attr' : {'class' : 'form-control mt-3'}}) }}
+            <label class="mt-3">Mot de passe :  </label>
+            {{ form_row(registerForm.password, {'attr' : {'class' : 'form-control mt-3'}}) }}
+            <button class="btn btn-primary mt-5 mb-5">S'inscrire</button>
+            {{ form_end(registerForm) }}
+        </div>
+    </div>
+
+{% endblock %}

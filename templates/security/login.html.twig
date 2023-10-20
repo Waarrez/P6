@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Log in!{% endblock %}
+
+{% block body %}
+    <div class="container mt-5 text-center col-md-3 mb-5">
+        <form method="post">
+            {% if error %}
+                <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            {% endif %}
+
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            <h1 class="h3 mb-3 font-weight-normal">Connexion</h1>
+            <label class="mt-5" for="inputUsername">Nom d'utilisateur :</label>
+            <input type="text" value="{{ last_username }}" name="username" id="inputUsername" class="form-control mt-5" autocomplete="username" required autofocus>
+            <label class="mt-5" for="inputPassword">Mot de passe :</label>
+            <input type="password" name="password" id="inputPassword" class="form-control mt-5 mb-5" autocomplete="current-password" required>
+
+            <input type="hidden" name="_csrf_token"
+                   value="{{ csrf_token('authenticate') }}"
+            >
+            <a href="">Mot de passe oublié ?</a> <br>
+            <button class="btn btn-primary mt-5" type="submit">
+                Connexion
+            </button>
+        </form>
+    </div>
+{% endblock %}
