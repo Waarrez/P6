@@ -5,6 +5,12 @@
 {% block body %}
 
     <div class="container mt-5 text-center col-md-3">
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
+
         <div>
             <h2>Inscription</h2>
         </div>

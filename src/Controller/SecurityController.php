@@ -90,6 +90,7 @@ class SecurityController extends AbstractController
 
             $mail->send($user->getEmail(), $user->getUsername(), $token);
 
+            $this->addFlash('success', 'Votre inscription à bien été enregistré, un mail de confirmation va être envoyé');
             $this->manager->persist($user);
             $this->manager->flush();
         }
