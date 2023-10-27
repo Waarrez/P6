@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title "Ajouter une nouvelle figure" %}
+
+{% block body %}
+
+    <div class="container text-center mt-5 mb-5 col-md-4">
+        <h2>Ajouter une nouvelle figure</h2>
+
+        {{ form_start(form, {'attr' : {'class' : 'mt-5'}}) }}
+        <label class="mt-2" for="">Nom de la figure : </label>
+        {{ form_row(form.name, {'attr' : {'class' : 'form-control mt-3'}}) }}
+        <label class="mt-2" for="">Description : </label>
+        {{ form_row(form.content, {'attr' : {'class' : 'form-control mt-3'}}) }}
+        <label class="mt-2" for="">Catégorie : </label>
+        {{ form_row(form.groups, {'attr' : {'class' : 'form-control mt-3'}}) }}
+        <label class="mt-2" for="">Images : </label>
+        {{ form_row(form.imageFile, {'attr' : {'class' : 'form-control mt-3'}}) }}
+        <label class="mt-2" for="">Vidéos : </label>
+        {{ form_row(form.medias, {'attr' : {'class' : 'form-control mt-3'}}) }}
+        <button class="btn btn-primary mt-5" type="submit">Ajouter</button>
+        {{ form_end(form) }}
+    </div>
+
+{% endblock %}
