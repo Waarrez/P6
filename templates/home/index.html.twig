@@ -1,84 +1,56 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Snowtricks | Accueil{% endblock %}
+{% block title %}Accueil{% endblock %}
 
 {% block body %}
     <div>
         <img width="100%" src="{{ asset("img/fond.jpg") }}" alt="">
     </div>
     <div style="margin-top: 150px" class="container-fluid d-flex justify-content-around flex-wrap p-5 mb-5">
-        <div class="card mb-3 col-md-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="d-block user-select-none" width="100%" height="200" aria-label="Placeholder: Image cap" focusable="false" role="img" preserveAspectRatio="xMidYMid slice" viewBox="0 0 318 180" style="font-size:1.125rem;text-anchor:middle">
-                <rect width="100%" height="100%" fill="#868e96"></rect>
-                <text x="50%" y="50%" fill="#dee2e6" dy=".3em">Image cap</text>
-            </svg>
-            <div class="card-body">
-                <h4 class="card-title text-center">TRICK</h4>
+        {% if tricks != [] %}
+            {% for trick in tricks %}
+                <div class="card mb-3 col-md-3">
+                    <img src="{{ asset('uploads/tricksImg/' ~ trick.images) }}" alt="">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-center">
+                            <h4 class="card-title text-center">
+                                <a href="{{ path('home.viewTrick', {'id' : trick.id}) }}">
+                                    {{ trick.name }}
+                                </a>
+                            </h4>
+                            <div style="margin-left: 10px">
+                                {% if app.user %}
+                                    <a href="{{ path('home.editTrick', {'id' : trick.id}) }}"><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"><path d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z"/></svg></a>
+                                    <a data-trick="{{ trick.id }}" id="confirmationButton" style="margin-left: 5px" href=""><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/></svg></a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-warning">
+                Aucune figure de disponible !
             </div>
-        </div>
-        <div class="card mb-3 col-md-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="d-block user-select-none" width="100%" height="200" aria-label="Placeholder: Image cap" focusable="false" role="img" preserveAspectRatio="xMidYMid slice" viewBox="0 0 318 180" style="font-size:1.125rem;text-anchor:middle">
-                <rect width="100%" height="100%" fill="#868e96"></rect>
-                <text x="50%" y="50%" fill="#dee2e6" dy=".3em">Image cap</text>
-            </svg>
-            <div class="card-body">
-                <h4 class="card-title text-center">TRICK</h4>
-            </div>
-        </div>
-        <div class="card mb-3 col-md-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="d-block user-select-none" width="100%" height="200" aria-label="Placeholder: Image cap" focusable="false" role="img" preserveAspectRatio="xMidYMid slice" viewBox="0 0 318 180" style="font-size:1.125rem;text-anchor:middle">
-                <rect width="100%" height="100%" fill="#868e96"></rect>
-                <text x="50%" y="50%" fill="#dee2e6" dy=".3em">Image cap</text>
-            </svg>
-            <div class="card-body">
-                <h4 class="card-title text-center">TRICK</h4>
-            </div>
-        </div>
-        <div class="card mb-3 col-md-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="d-block user-select-none" width="100%" height="200" aria-label="Placeholder: Image cap" focusable="false" role="img" preserveAspectRatio="xMidYMid slice" viewBox="0 0 318 180" style="font-size:1.125rem;text-anchor:middle">
-                <rect width="100%" height="100%" fill="#868e96"></rect>
-                <text x="50%" y="50%" fill="#dee2e6" dy=".3em">Image cap</text>
-            </svg>
-            <div class="card-body">
-                <h4 class="card-title text-center">TRICK</h4>
-            </div>
-        </div>
-        <div class="card mb-3 col-md-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="d-block user-select-none" width="100%" height="200" aria-label="Placeholder: Image cap" focusable="false" role="img" preserveAspectRatio="xMidYMid slice" viewBox="0 0 318 180" style="font-size:1.125rem;text-anchor:middle">
-                <rect width="100%" height="100%" fill="#868e96"></rect>
-                <text x="50%" y="50%" fill="#dee2e6" dy=".3em">Image cap</text>
-            </svg>
-            <div class="card-body">
-                <h4 class="card-title text-center">TRICK</h4>
-            </div>
-        </div>
-        <div class="card mb-3 col-md-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="d-block user-select-none" width="100%" height="200" aria-label="Placeholder: Image cap" focusable="false" role="img" preserveAspectRatio="xMidYMid slice" viewBox="0 0 318 180" style="font-size:1.125rem;text-anchor:middle">
-                <rect width="100%" height="100%" fill="#868e96"></rect>
-                <text x="50%" y="50%" fill="#dee2e6" dy=".3em">Image cap</text>
-            </svg>
-            <div class="card-body">
-                <h4 class="card-title text-center">TRICK</h4>
-            </div>
-        </div>
-        <div class="card mb-3 col-md-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="d-block user-select-none" width="100%" height="200" aria-label="Placeholder: Image cap" focusable="false" role="img" preserveAspectRatio="xMidYMid slice" viewBox="0 0 318 180" style="font-size:1.125rem;text-anchor:middle">
-                <rect width="100%" height="100%" fill="#868e96"></rect>
-                <text x="50%" y="50%" fill="#dee2e6" dy=".3em">Image cap</text>
-            </svg>
-            <div class="card-body">
-                <h4 class="card-title text-center">TRICK</h4>
-            </div>
-        </div>
-        <div class="card mb-3 col-md-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="d-block user-select-none" width="100%" height="200" aria-label="Placeholder: Image cap" focusable="false" role="img" preserveAspectRatio="xMidYMid slice" viewBox="0 0 318 180" style="font-size:1.125rem;text-anchor:middle">
-                <rect width="100%" height="100%" fill="#868e96"></rect>
-                <text x="50%" y="50%" fill="#dee2e6" dy=".3em">Image cap</text>
-            </svg>
-            <div class="card-body">
-                <h4 class="card-title text-center">TRICK</h4>
-            </div>
-        </div>
-        <button class="btn btn-outline-primary mt-5">Charger plus</button>
+        {% endif %}
     </div>
+    {% if tricks != [] %}
+        <div class="d-flex justify-content-center align-items-center">
+            <button class="btn btn-outline-primary mt-5 mb-5">Charger plus</button>
+        </div>
+    {% endif %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let confirmationButton = document.getElementById("confirmationButton");
+
+            confirmationButton.addEventListener("click", function(event) {
+                event.preventDefault();
+                const confirmation = confirm("Êtes-vous sûr de supprimer cette figure ?");
+                if (confirmation) {
+                    const idTrick = confirmationButton.getAttribute('data-trick');
+                    window.location.href = "/trick/remove/" + idTrick
+                }
+            });
+        });
+    </script>
 {% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title trick.name  %}
+
+{% block body %}
+
+    <div class="text-center">
+        <p style="position:absolute;font-size: 150px; color: black; font-weight: bold; top: 50%; left: 50%; transform: translate(-50%, -50%);">{{ trick.name }}</p>
+        <img width="100%" src="{{ asset('uploads/tricksImg/' ~ trick.images) }}" alt="">
+    </div>
+
+    {% if trick.medias %}
+        <div class="container mt-5">
+            <iframe src="{{ trick.medias }}" frameborder="0"></iframe>
+        </div>
+    {% endif %}
+
+    <div class="container mt-5 mb-5 d-flex justify-content-around align-items-center">
+        <span class="badge bg-primary">{{ trick.groups.name }}</span>
+        <span class="badge bg-primary">Créer le {{ trick.createdAt|date('d-m-Y') }}</span>
+        <span class="badge bg-primary">Modifier le {{ trick.editAt|date('d-m-Y') }}</span>
+    </div>
+
+    <div class="d-flex justify-content-center align-items-center flex-column mb-5">
+        <hr style="width: 50%; ">
+
+        <div class="col-md-6">
+            <h2 class="text-center mt-5 mb-5">Ecrire un commentaire</h2>
+            <div class="d-flex flex-row">
+                <input class="form-control" type="text">
+                <button class="btn btn-primary">Envoyer</button>
+            </div>
+        </div>
+
+        <hr class="mt-5" style="width: 50%; ">
+    </div>
+
+    <div style="width: 50%" class="container mt-5">
+        <div style="background-color : #f7f7f9">
+            <p class="p-4">Salut le monde</p>
+        </div>
+        <div style="background-color : #f7f7f9">
+            <p class="p-4">Salut le monde</p>
+        </div>
+        <div style="background-color : #f7f7f9">
+            <p class="p-4">Salut le monde</p>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-center align-items-center">
+        <button class="btn btn-outline-primary mt-5 mb-5">Charger plus</button>
+    </div>
+
+{% endblock %}
