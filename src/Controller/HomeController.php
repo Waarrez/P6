@@ -2,11 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\Comment;
 use App\Entity\Trick;
+use App\Form\CommentFormType;
 use App\Form\TrickFormType;
 use App\Repository\TrickRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -68,12 +71,37 @@ class HomeController extends AbstractController
     }
 
     #[Route('/trick/detail/{id}', name: "home.viewTrick")]
-    public function viewTrick(string $id) : Response {
+    public function viewTrick(string $id, Request $request, Security $security) : Response {
 
         $trick = $this->trickRepository->find($id);
 
+        $comment = new Comment();
+
+        $user = $security->getUser();
+
+        $commentForm = $this->createForm(CommentFormType::class, $comment);
+
+        $commentForm->handleRequest($request);
+
+        if($commentForm->isSubmitted() && $commentForm->isValid()) {
+
+            $comment->setTrick($trick);
+            $comment->setUsername($user->getUsername());
+
+            $this->entityManager->persist($comment);
+            $this->entityManager->flush();
+
+            $this->addFlash('success', 'Votre commentaire à bien été envoyé !');
+
+            return $this->redirectToRoute('home.viewTrick', ['id' => $id]);
+        }
+
+        $comments = $trick->getComments();
+
         return $this->render('tricks/view_trick.html.twig', [
-            'trick' => $trick
+            'trick' => $trick,
+            'commentForm' => $commentForm,
+            'comments' => $comments
         ]);
     }
 
@@ -131,6 +159,7 @@ class HomeController extends AbstractController
         $this->entityManager->flush();
 
         return $this->redirectToRoute('home.index');
-
     }
+
+
 }
