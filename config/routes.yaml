@@ -3,3 +3,8 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+
+add_comment:
+    path: /add-comment
+    controller: 'App\Controller\HomeController::addComment'
+    methods: ['POST']

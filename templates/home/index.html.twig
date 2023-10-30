@@ -43,6 +43,8 @@
         document.addEventListener("DOMContentLoaded", function() {
             let confirmationButton = document.getElementById("confirmationButton");
 
+            console.log(confirmationButton)
+
             confirmationButton.addEventListener("click", function(event) {
                 event.preventDefault();
                 const confirmation = confirm("Êtes-vous sûr de supprimer cette figure ?");

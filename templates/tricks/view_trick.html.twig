@@ -32,18 +32,16 @@
             {% endfor %}
 
             <h2 class="text-center mt-5 mb-5">Ecrire un commentaire</h2>
-                {{ form_start(commentForm) }}
-                <div class="d-flex flex-row">
-                    {{ form_widget(commentForm.content, {'attr' : {'class' : 'form-control'}}) }}
-                    <button class="btn btn-primary">Envoyer</button>
-                </div>
-                {{ form_end(commentForm) }}
+            <form class="d-flex align-items-center p-3 mt-5" id="commentForm">
+                <input id="content" type="text" class="form-control">
+                <button class="btn btn-primary">Envoyer</button>
+            </form>
         </div>
 
         <hr class="mt-5" style="width: 50%; ">
     </div>
 
-    <div style="width: 50%" class="container mt-5 mb-5">
+    <div style="width: 50%" class="container mt-5 mb-5" id="commentaires">
         {% for comment in comments %}
             <div class="d-flex align-items-center p-3 mt-5" style="background-color : #f7f7f9">
                 <span class="badge bg-primary" style="margin-left: 20px">{{ comment.username }}</span>
@@ -54,8 +52,54 @@
 
     {% if comments|length > 3 %}
         <div class="d-flex justify-content-center align-items-center">
-            <button class="btn btn-outline-primary mt-5 mb-5">Charger plus</button>
+            <button id="sendComment" class="btn btn-outline-primary mt-5 mb-5">Charger plus</button>
         </div>
     {% endif %}
+
+    <script type="module">
+        let url = window.location.href;
+
+        // Utilisez une expression régulière pour extraire l'ID
+        let idMatches = url.match(/\/trick\/detail\/([^\/]+)$/);
+        let id = idMatches && idMatches[1];
+
+        document.getElementById('commentForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Empêche la soumission du formulaire par défaut
+
+            const content = document.getElementById('content').value;
+
+            let xhttp = new XMLHttpRequest();
+
+            xhttp.onreadystatechange = function() {
+                if (this.readyState === 4 && this.status === 200) {
+                    let response = JSON.parse(this.responseText);
+                    let message = response.message;
+                    let newComments = response.comments;
+
+                    // Mettez à jour la liste des commentaires
+                    var commentairesDiv = document.getElementById('commentaires');
+                    commentairesDiv.innerHTML = '';
+                    commentairesDiv.innerHTML = '<div class="alert alert-success">Votre commentaire à bien été ajouté !</div>'
+
+                    newComments.forEach(function(comment) {
+                        let newCommentDiv = document.createElement('div');
+                        newCommentDiv.classList.add('d-flex', 'align-items-center', 'p-3', 'mt-5');
+                        newCommentDiv.style.backgroundColor = '#f7f7f9';
+                        newCommentDiv.innerHTML = `
+                <span class="badge bg-primary" style="margin-left: 20px">${comment.username}</span>
+                <p style="margin-left: 100px; margin-bottom: 0">${comment.content}</p>`;
+                        commentairesDiv.appendChild(newCommentDiv);
+                    });
+
+                    // Affichez le message de succès ou effectuez d'autres actions si nécessaire
+                    console.log(message);
+                }
+            };
+
+            xhttp.open('POST', '/add-comment', true); // Assurez-vous d'indiquer le bon chemin pour l'ajout de commentaire
+            xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            xhttp.send('id=' + id + '&content=' + content);
+        });
+    </script>
 
 {% endblock %}
