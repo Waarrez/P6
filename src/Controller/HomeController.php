@@ -10,6 +10,7 @@ use App\Repository\TrickRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -75,32 +76,10 @@ class HomeController extends AbstractController
 
         $trick = $this->trickRepository->find($id);
 
-        $comment = new Comment();
-
-        $user = $security->getUser();
-
-        $commentForm = $this->createForm(CommentFormType::class, $comment);
-
-        $commentForm->handleRequest($request);
-
-        if($commentForm->isSubmitted() && $commentForm->isValid()) {
-
-            $comment->setTrick($trick);
-            $comment->setUsername($user->getUsername());
-
-            $this->entityManager->persist($comment);
-            $this->entityManager->flush();
-
-            $this->addFlash('success', 'Votre commentaire à bien été envoyé !');
-
-            return $this->redirectToRoute('home.viewTrick', ['id' => $id]);
-        }
-
         $comments = $trick->getComments();
 
         return $this->render('tricks/view_trick.html.twig', [
             'trick' => $trick,
-            'commentForm' => $commentForm,
             'comments' => $comments
         ]);
     }
@@ -161,5 +140,34 @@ class HomeController extends AbstractController
         return $this->redirectToRoute('home.index');
     }
 
+    public function addComment(Request $request): JsonResponse
+    {
+        $user = $this->getUser();
+        $content = $request->request->get('content');
+        $id = $request->request->get('id');
+        $trick = $this->trickRepository->find($id);
 
+        // Créez une nouvelle instance de l'entité Comment et définissez ses propriétés
+        $comment = new Comment();
+        $comment->setContent($content);
+        $comment->setTrick($trick);
+        $comment->setUsername($user->getUsername());
+
+        // Enregistrez le commentaire dans la base de données
+        $this->entityManager->persist($comment);
+        $this->entityManager->flush();
+
+        $updatedComments = [];
+        foreach ($trick->getComments() as $comment) {
+            $updatedComments[] = [
+                'username' => $comment->getUsername(),
+                'content' => $comment->getContent(),
+            ];
+        }
+
+        return new JsonResponse([
+            'message' => 'Commentaire ajouté avec succès',
+            'comments' => $updatedComments,
+        ]);
+    }
 }

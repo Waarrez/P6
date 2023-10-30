@@ -34,4 +34,29 @@ class MailJet
         ];
         $mj->post(Resources::$Email, ['body' => $body]);
     }
+
+    public function sendCode(string $mail,string $username, int $code) {
+        $mj = new Client($this->apikey,$this->secretKey,true,['version' => 'v3.1']);
+        $body = [
+            'Messages' => [
+                [
+                    'From' => [
+                        'Email' => "thimote.cabotte6259@gmail.com",
+                        'Name' => "Thimote"
+                    ],
+                    'To' => [
+                        [
+                            'Email' => $mail,
+                            'Name' => $username
+                        ]
+                    ],
+                    'Subject' => "Votre code de confirmation pour changer de mot de passe",
+                    'TextPart' => "My first Mailjet email",
+                    'HTMLPart' => "<p>Voici votre code : $code</p>",
+                    'CustomID' => "AppGettingStartedTest"
+                ]
+            ]
+        ];
+        $mj->post(Resources::$Email, ['body' => $body]);
+    }
 }

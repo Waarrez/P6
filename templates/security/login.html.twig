@@ -24,7 +24,7 @@
             <input type="hidden" name="_csrf_token"
                    value="{{ csrf_token('authenticate') }}"
             >
-            <a href="">Mot de passe oublié ?</a> <br>
+            <a href="{{ path('home.resetPassword') }}">Mot de passe oublié ?</a> <br>
             <button class="btn btn-primary mt-5" type="submit">
                 Connexion
             </button>
