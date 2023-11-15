@@ -8,3 +8,8 @@ add_comment:
     path: /add-comment
     controller: 'App\Controller\HomeController::addComment'
     methods: ['POST']
+
+showMoreTricks:
+    path: /show-more-tricks
+    controller: 'App\Controller\HomeController::showMoreTricks'
+    methods: [ 'GET' ]

@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Comment;
 use App\Entity\Trick;
-use App\Form\CommentFormType;
 use App\Form\TrickFormType;
 use App\Repository\TrickRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,9 +26,20 @@ class HomeController extends AbstractController
     public function index(): Response
     {
 
-        $tricks = $this->trickRepository->findAll();
+        $tricks = $this->trickRepository->getFourTricks();
 
         return $this->render('home/index.html.twig', [
+            'tricks' => $tricks
+        ]);
+    }
+
+    #[Route('/tricks', name: 'home.tricks')]
+    public function tricks(): Response
+    {
+
+        $tricks = $this->trickRepository->findAll();
+
+        return $this->render('tricks/tricks.html.twig', [
             'tricks' => $tricks
         ]);
     }
@@ -169,5 +179,12 @@ class HomeController extends AbstractController
             'message' => 'Commentaire ajouté avec succès',
             'comments' => $updatedComments,
         ]);
+    }
+
+    public function showMoreTricks(): JsonResponse
+    {
+        $tricks = $this->trickRepository->getFourTricks();
+
+        return new JsonResponse(['tricks' => $tricks]);
     }
 }
