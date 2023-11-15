@@ -6,11 +6,11 @@
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
         <link rel="stylesheet" href="https://bootswatch.com/5/lux/bootstrap.min.css">
         {% block stylesheets %}
-            {{ encore_entry_link_tags('app') }}
+            {{ encore_entry_link_tags('root') }}
         {% endblock %}
 
         {% block javascripts %}
-            {{ encore_entry_script_tags('app') }}
+            {{ encore_entry_script_tags('root') }}
         {% endblock %}
     </head>
     <body>
@@ -26,8 +26,9 @@
                             <a class="nav-link" href="{{ path('home.index') }}">Accueil</a>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Figures</a>
+                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Figures</a>
                             <div class="dropdown-menu">
+                                <a class="dropdown-item" href="{{ path('home.tricks') }}">Toutes les figures</a>
                                 <a class="dropdown-item" href="{{ path('home.addTrick') }}">Ajouter une figure</a>
                             </div>
                         </li>
