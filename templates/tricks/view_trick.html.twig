@@ -10,8 +10,13 @@
     </div>
 
     {% if trick.medias %}
-        <div class="container mt-5">
+        <div class="mt-5 d-flex align-items-center justify-content-around">
             <iframe src="{{ trick.medias }}" frameborder="0"></iframe>
+            {% if trick.imagesTrick %}
+                {% for imagesTrick in trick.imagesTrick  %}
+                    <img width="20%" src="{{ asset('uploads/tricksImg/' ~ imagesTrick.name ) }}" alt="">
+                {% endfor %}
+            {% endif %}
         </div>
     {% endif %}
 

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Comment;
+use App\Entity\Images;
 use App\Entity\Trick;
 use App\Form\TrickFormType;
 use App\Repository\CommentRepository;
@@ -58,6 +59,25 @@ class HomeController extends AbstractController
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()) {
             $file = $form->get('imageFile')->getData();
+            $files = $form->get('images')->getData();
+
+            foreach ($files as $images) {
+                $newFileName = uniqid().'.'.$images->guessExtension();
+
+                try {
+                    $images->move($this->getParameter("upload_directory"), $newFileName);
+
+                    $imagesTricks = new Images();
+                    $imagesTricks->setTricks($trick)
+                        ->setName($newFileName);
+
+                    $trick->addImagesTrick($imagesTricks);
+
+                    $this->entityManager->persist($imagesTricks);
+                } catch (\Exception $e) {
+                    // Handle the exception, log or throw it
+                }
+            }
 
             if($file) {
                 $uploadDirectory = $this->getParameter("upload_directory");
@@ -106,7 +126,28 @@ class HomeController extends AbstractController
 
         $form->handleRequest($request);
 
+
         if($form->isSubmitted() && $form->isValid()) {
+            $files = $form->get('images')->getData();
+
+            foreach ($files as $images) {
+                $newFileName = uniqid().'.'.$images->guessExtension();
+
+                try {
+                    $images->move($this->getParameter("upload_directory"), $newFileName);
+
+                    $imagesTricks = new Images();
+                    $imagesTricks->setTricks($trick)
+                        ->setName($newFileName);
+
+                    $trick->addImagesTrick($imagesTricks);
+
+                    $this->entityManager->persist($imagesTricks);
+                } catch (\Exception $e) {
+                    // Handle the exception, log or throw it
+                }
+            }
+
             if($trick->getImages() !== null) {
                 $file = $form->get('imageFile')->getData();
                 if($file) {

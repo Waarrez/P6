@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Group;
+use App\Entity\Images;
 use App\Entity\Trick;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -41,6 +42,12 @@ class TrickFormType extends AbstractType
                         'mimeTypesMessage' => 'Veuillez télécharger une image valide (JPEG, PNG).',
                     ]),
                 ],
+            ])
+            ->add('images', FileType::class, [
+                'multiple' => true,
+                'mapped' => false,
+                'required' => false,
+                'label' => false,
             ])
             ->add('medias', TextType::class, [
                 'label' => false
