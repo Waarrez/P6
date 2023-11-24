@@ -71,7 +71,7 @@ class SecurityController extends AbstractController
     /**
      * @throws Exception
      */
-    #[Route('/inscription', name: 'home.register')]
+    #[Route('/register', name: 'home.register')]
     public function register(Request $request) : Response {
 
         if($this->getUser()) {

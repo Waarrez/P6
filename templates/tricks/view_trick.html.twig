@@ -41,9 +41,9 @@
         <hr class="mt-5" style="width: 50%; ">
     </div>
 
-    <div style="width: 50%" class="container mt-5 mb-5" id="commentaires">
+    <div style="width: 50%" class="container mt-5 mb-5 " id="commentaires">
         {% for comment in comments %}
-            <div class="d-flex align-items-center p-3 mt-5" style="background-color : #f7f7f9">
+            <div id="fourComments" class="comments" style="background-color: #f7f7f9">
                 <span class="badge bg-primary" style="margin-left: 20px">{{ comment.username }}</span>
                 <p style="margin-left: 100px; margin-bottom: 0" class="">{{ comment.content }}</p>
             </div>
@@ -52,7 +52,7 @@
 
     {% if comments|length > 3 %}
         <div class="d-flex justify-content-center align-items-center">
-            <button id="sendComment" class="btn btn-outline-primary mt-5 mb-5">Charger plus</button>
+            <button id="loadComment" class="btn btn-outline-primary mt-5 mb-5">Charger plus</button>
         </div>
     {% endif %}
 
@@ -77,7 +77,7 @@
                     let newComments = response.comments;
 
                     // Mettez à jour la liste des commentaires
-                    var commentairesDiv = document.getElementById('commentaires');
+                    let commentairesDiv = document.getElementById('commentaires');
                     commentairesDiv.innerHTML = '';
                     commentairesDiv.innerHTML = '<div class="alert alert-success">Votre commentaire à bien été ajouté !</div>'
 
@@ -90,9 +90,6 @@
                 <p style="margin-left: 100px; margin-bottom: 0">${comment.content}</p>`;
                         commentairesDiv.appendChild(newCommentDiv);
                     });
-
-                    // Affichez le message de succès ou effectuez d'autres actions si nécessaire
-                    console.log(message);
                 }
             };
 
@@ -100,6 +97,19 @@
             xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
             xhttp.send('id=' + id + '&content=' + content);
         });
+
+        let comments = document.getElementsByClassName("comments");
+        let buttonShow = document.getElementById("loadComment");
+
+        console.log(comments);
+
+        buttonShow.addEventListener('click', () => {
+            for (let i = 0; i < comments.length; i++) {
+                comments[i].removeAttribute("id");
+            }
+            buttonShow.classList.add("noneButton");
+        });
+
     </script>
 
 {% endblock %}

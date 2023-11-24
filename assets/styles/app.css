@@ -1,3 +1,26 @@
+#card > * {
+    display: none;
+}
+
+#card > :nth-child(-n+4) {
+    display: flex;
+}
+
+.noneButton {
+    display: none;
+}
+
+.comments {
+    display: flex;
+    padding: 20px;
+    margin-top: 70px;
+    align-items: center;
+}
+
+#fourComments:nth-child(n+5) {
+    display: none;
+}
+
 .footer {
     height: 100px;
     width: 100%;
