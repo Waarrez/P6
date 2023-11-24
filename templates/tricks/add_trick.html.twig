@@ -14,8 +14,10 @@
         {{ form_row(form.content, {'attr' : {'class' : 'form-control mt-3'}}) }}
         <label class="mt-2" for="">Catégorie : </label>
         {{ form_row(form.groups, {'attr' : {'class' : 'form-control mt-3'}}) }}
-        <label class="mt-2" for="">Images : </label>
+        <label class="mt-2" for="">Image principal : </label>
         {{ form_row(form.imageFile, {'attr' : {'class' : 'form-control mt-3'}}) }}
+        <label class="mt-2" for="">Autres images : </label>
+        {{ form_row(form.images, {'attr' : {'class' : 'form-control mt-3'}}) }}
         <label class="mt-2" for="">Vidéos : </label>
         {{ form_row(form.medias, {'attr' : {'class' : 'form-control mt-3'}}) }}
         <button class="btn btn-primary mt-5" type="submit">Ajouter</button>
