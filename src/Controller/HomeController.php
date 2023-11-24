@@ -96,6 +96,7 @@ class HomeController extends AbstractController
 
                 $this->entityManager->persist($trick);
                 $this->entityManager->flush();
+                return $this->redirectToRoute('home.index');
             }
         }
 
