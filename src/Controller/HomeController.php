@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Comment;
 use App\Entity\Trick;
 use App\Form\TrickFormType;
+use App\Repository\CommentRepository;
 use App\Repository\TrickRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -13,12 +14,14 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class HomeController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly TrickRepository $trickRepository
+        private readonly TrickRepository $trickRepository,
+        private readonly CommentRepository $commentRepository
     )
     {}
 
@@ -26,7 +29,7 @@ class HomeController extends AbstractController
     public function index(): Response
     {
 
-        $tricks = $this->trickRepository->getFourTricks();
+        $tricks = $this->trickRepository->findAll();
 
         return $this->render('home/index.html.twig', [
             'tricks' => $tricks
@@ -136,6 +139,10 @@ class HomeController extends AbstractController
 
         $trick = $this->trickRepository->find($id);
 
+        foreach ($trick->getComments() as $comment) {
+            $trick->removeComment($comment);
+        }
+
         $imagePath = $this->getParameter('upload_directory') . '/' . $trick->getImages();
 
         if (file_exists($imagePath)) {
@@ -179,12 +186,5 @@ class HomeController extends AbstractController
             'message' => 'Commentaire ajouté avec succès',
             'comments' => $updatedComments,
         ]);
-    }
-
-    public function showMoreTricks(): JsonResponse
-    {
-        $tricks = $this->trickRepository->getFourTricks();
-
-        return new JsonResponse(['tricks' => $tricks]);
     }
 }

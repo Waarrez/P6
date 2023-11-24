@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Validator\Constraints\File;
 
@@ -17,34 +18,43 @@ class Trick
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'NONE')]
     #[ORM\Column(type: Types::STRING)]
+    #[Groups("tricks")]
     private ?string $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups("tricks")]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups("tricks")]
     private ?string $content = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups("tricks")]
     private ?string $images = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups("tricks")]
     private ?string $medias = null;
 
     #[ORM\ManyToOne(inversedBy: 'tricks')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups("tricks")]
     private ?Group $groups = null;
 
     #[File]
     private ?UploadedFile $imageFile = null;
 
     #[ORM\Column]
+    #[Groups("tricks")]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups("tricks")]
     private ?\DateTimeImmutable $editAt = null;
 
     #[ORM\OneToMany(mappedBy: 'trick', targetEntity: Comment::class)]
+    #[Groups("tricks")]
     private Collection $comments;
 
     public function __construct()

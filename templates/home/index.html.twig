@@ -6,10 +6,10 @@
     <div>
         <img width="100%" src="{{ asset("img/fond.jpg") }}" alt="">
     </div>
-    <div style="margin-top: 150px" class="container-fluid d-flex justify-content-around flex-wrap p-5 mb-5">
+    <div id="card" style="margin-top: 150px" class="container-fluid d-flex justify-content-around flex-wrap mb-5">
         {% if tricks != [] %}
             {% for trick in tricks %}
-                <div class="card mb-3 col-md-2">
+                <div class="card m-3 col-md-2">
                     <img src="{{ asset('uploads/tricksImg/' ~ trick.images) }}" alt="">
                     <div class="card-body">
                         <div class="d-flex justify-content-center">
@@ -39,6 +39,7 @@
             <button id="showMoreTrick" class="btn btn-outline-primary mt-5 mb-5">Charger plus</button>
         </div>
     {% endif %}
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             let confirmationButtons = document.querySelectorAll(".confirmationButton");
@@ -54,28 +55,13 @@
                 });
             });
 
-            let showMoreTricks = document.getElementById("showMoreTrick")
 
-            showMoreTricks.addEventListener('click', function (event) {
-                let xhr = new XMLHttpRequest();
+            let showAll = document.getElementById("card");
+            let buttonShow = document.getElementById("showMoreTrick")
 
-                xhr.open('GET', '/show-more-tricks', true);
-
-                xhr.onload = function() {
-                    if (xhr.status >= 200 && xhr.status < 400) {
-                        const response = JSON.parse(xhr.responseText);
-                        // Manipuler la réponse ici
-                        console.log(response)
-                    } else {
-                        console.error('Erreur lors de la requête');
-                    }
-                };
-
-                xhr.onerror = function() {
-                    console.error('Erreur réseau');
-                };
-
-                xhr.send();
+            buttonShow.addEventListener('click', () => {
+                showAll.removeAttribute("id")
+                buttonShow.classList.add("noneButton")
             })
         });
     </script>
