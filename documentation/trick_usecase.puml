@@ -1,0 +1,24 @@
+@startuml
+left to right direction
+actor User
+actor "Utilisateur non connecté" as Guest
+
+usecase "Créer un trick" as UC_Create
+usecase "Modifier un trick" as UC_Edit
+usecase "Supprimer un trick" as UC_Delete
+usecase "Voir un trick" as UC_View
+usecase "Commenter un trick" as UC_Comment
+usecase "Ajouter une image à un trick" as UC_AddImage
+usecase "Se connecter" as UC_Login
+
+Guest --> UC_View
+User --> UC_View
+
+Guest --> UC_Login
+User --> UC_Create
+User --> UC_Edit
+User --> UC_Delete
+User --> UC_Comment
+User --> UC_AddImage
+
+@enduml
