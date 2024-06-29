@@ -51,7 +51,7 @@ class TrickController extends AbstractController
     }
 
     #[Route('/trick/detail/{id}', name: "home.viewTrick")]
-    public function viewTrick(string $id, Request $request, Security $security) : Response {
+    public function viewTrick(string $id) : Response {
 
         $trick = $this->trickRepository->find($id);
 
@@ -68,7 +68,8 @@ class TrickController extends AbstractController
         $trick = $this->trickRepository->find($id);
 
         if (!$trick) {
-            throw $this->createNotFoundException('No trick found for id '.$id);
+            $this->addFlash("error", "La figure n'existe pas !");
+            $this->redirectToRoute("home.index");
         }
 
         $form = $this->trickHandler->prepare($trick);
@@ -83,21 +84,32 @@ class TrickController extends AbstractController
     }
 
     #[Route('/trick/remove/{id}', name: "deleteTrick")]
-    public function deleteTrick(string $id) : Response {
-
+    public function deleteTrick(string $id): Response
+    {
         $trick = $this->trickRepository->find($id);
 
-        foreach ($trick->getComments() as $comment) {
-            $trick->removeComment($comment);
+        if (!$trick) {
+            throw $this->createNotFoundException('No trick found for id ' . $id);
         }
 
+        // Supprimer les commentaires associés au trick
+        foreach ($trick->getComments() as $comment) {
+            $this->entityManager->remove($comment);
+        }
+
+        // Supprimer l'image du trick
         $imagePath = $this->getParameter('upload_directory') . '/' . $trick->getImages();
 
         if (file_exists($imagePath)) {
-            unlink($imagePath);
+            try {
+                unlink($imagePath);
+            } catch (\Exception $e) {
+                // Gérer l'erreur de suppression du fichier
+                $this->addFlash('error', 'An error occurred while deleting the image.');
+            }
         }
 
-
+        // Supprimer le trick lui-même
         $this->entityManager->remove($trick);
         $this->entityManager->flush();
 
