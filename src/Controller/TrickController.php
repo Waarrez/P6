@@ -89,30 +89,31 @@ class TrickController extends AbstractController
         $trick = $this->trickRepository->find($id);
 
         if (!$trick) {
-            throw $this->createNotFoundException('No trick found for id ' . $id);
+            $this->addFlash("error", "La figure n'existe pas !");
+            return $this->redirectToRoute('home.index');
         }
 
-        // Supprimer les commentaires associés au trick
-        foreach ($trick->getComments() as $comment) {
-            $this->entityManager->remove($comment);
+        $comments = $trick->getComments();
+        if ($comments) {
+            foreach ($comments as $comment) {
+                $this->entityManager->remove($comment);
+            }
         }
 
-        // Supprimer l'image du trick
         $imagePath = $this->getParameter('upload_directory') . '/' . $trick->getImages();
 
         if (file_exists($imagePath)) {
             try {
                 unlink($imagePath);
             } catch (\Exception $e) {
-                // Gérer l'erreur de suppression du fichier
-                $this->addFlash('error', 'An error occurred while deleting the image.');
+                $this->addFlash('error', 'Une erreur est survenue lors de la suppression de l\'image.');
             }
         }
 
-        // Supprimer le trick lui-même
         $this->entityManager->remove($trick);
         $this->entityManager->flush();
 
+        $this->addFlash("success", "La figure a été supprimée avec succès !");
         return $this->redirectToRoute('home.index');
     }
 
