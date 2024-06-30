@@ -11,10 +11,11 @@ use App\Repository\TrickRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route;
 
 class TrickController extends AbstractController
 {
@@ -22,10 +23,14 @@ class TrickController extends AbstractController
     public function __construct(
         private readonly TrickRepository $trickRepository,
         private readonly TrickHandler $trickHandler,
-        private readonly EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager,
+        private readonly Filesystem $filesystem
     )
     {}
 
+    /**
+     * @return Response
+     */
     #[Route('/tricks', name: 'tricks')]
     public function tricks(): Response
     {
@@ -36,6 +41,10 @@ class TrickController extends AbstractController
         ]);
     }
 
+    /**
+     * @param Request $request
+     * @return Response
+     */
     #[Route('/addTrick', name: 'addTrick')]
     public function addTrick(Request $request) : Response {
         $trick = new Trick();
@@ -50,6 +59,10 @@ class TrickController extends AbstractController
         ]);
     }
 
+    /**
+     * @param string $id
+     * @return Response
+     */
     #[Route('/trick/detail/{id}', name: "home.viewTrick")]
     public function viewTrick(string $id) : Response {
 
@@ -63,6 +76,11 @@ class TrickController extends AbstractController
         ]);
     }
 
+    /**
+     * @param string $id
+     * @param Request $request
+     * @return Response
+     */
     #[Route('/trick/edit/{id}', name: "editTrick")]
     public function editTrick(string $id, Request $request) : Response {
         $trick = $this->trickRepository->find($id);
@@ -83,6 +101,10 @@ class TrickController extends AbstractController
         ]);
     }
 
+    /**
+     * @param string $id
+     * @return Response
+     */
     #[Route('/trick/remove/{id}', name: "deleteTrick")]
     public function deleteTrick(string $id): Response
     {
@@ -104,7 +126,7 @@ class TrickController extends AbstractController
 
         if (file_exists($imagePath)) {
             try {
-                unlink($imagePath);
+                $this->filesystem->remove($imagePath);
             } catch (\Exception $e) {
                 $this->addFlash('error', 'Une erreur est survenue lors de la suppression de l\'image.');
             }
@@ -117,6 +139,10 @@ class TrickController extends AbstractController
         return $this->redirectToRoute('home.index');
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function addComment(Request $request): JsonResponse
     {
         $user = $this->getUser();
