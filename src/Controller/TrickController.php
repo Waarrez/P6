@@ -3,15 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Comment;
-use App\Entity\Images;
 use App\Entity\Trick;
-use App\Form\Trick\TrickFormType;
 use App\Form\Trick\TrickHandler;
 use App\Repository\TrickRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,18 +17,13 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class TrickController extends AbstractController
 {
-
     public function __construct(
         private readonly TrickRepository $trickRepository,
         private readonly TrickHandler $trickHandler,
         private readonly EntityManagerInterface $entityManager,
         private readonly Filesystem $filesystem
-    )
-    {}
+    ) {}
 
-    /**
-     * @return Response
-     */
     #[Route('/tricks', name: 'tricks')]
     public function tricks(): Response
     {
@@ -41,12 +34,8 @@ class TrickController extends AbstractController
         ]);
     }
 
-    /**
-     * @param Request $request
-     * @return Response
-     */
     #[Route('/addTrick', name: 'addTrick')]
-    public function addTrick(Request $request) : Response {
+    public function addTrick(Request $request): Response {
         $trick = new Trick();
         $form = $this->trickHandler->prepare($trick);
 
@@ -59,15 +48,9 @@ class TrickController extends AbstractController
         ]);
     }
 
-    /**
-     * @param string $id
-     * @return Response
-     */
     #[Route('/trick/detail/{id}', name: "home.viewTrick")]
-    public function viewTrick(string $id) : Response {
-
+    public function viewTrick(string $id): Response {
         $trick = $this->trickRepository->find($id);
-
         $comments = $trick->getComments();
 
         return $this->render('tricks/view_trick.html.twig', [
@@ -76,18 +59,13 @@ class TrickController extends AbstractController
         ]);
     }
 
-    /**
-     * @param string $id
-     * @param Request $request
-     * @return Response
-     */
     #[Route('/trick/edit/{id}', name: "editTrick")]
-    public function editTrick(string $id, Request $request) : Response {
+    public function editTrick(string $id, Request $request): Response {
         $trick = $this->trickRepository->find($id);
 
         if (!$trick) {
             $this->addFlash("error", "La figure n'existe pas !");
-            $this->redirectToRoute("home.index");
+            return $this->redirectToRoute("home.index");
         }
 
         $form = $this->trickHandler->prepare($trick);
@@ -97,14 +75,10 @@ class TrickController extends AbstractController
         }
 
         return $this->render('tricks/edit_trick.html.twig', [
-            'form'  => $form->createView()
+            'form' => $form->createView()
         ]);
     }
 
-    /**
-     * @param string $id
-     * @return Response
-     */
     #[Route('/trick/remove/{id}', name: "deleteTrick")]
     public function deleteTrick(string $id): Response
     {
@@ -116,16 +90,23 @@ class TrickController extends AbstractController
         }
 
         $comments = $trick->getComments();
-
         if ($comments) {
             foreach ($comments as $comment) {
                 $this->entityManager->remove($comment);
             }
         }
 
-        $imagePath = $this->getParameter('upload_directory') . '/' . $trick->getImages();
+        $uploadDirectory = $this->getParameter('upload_directory');
+        $imagePath = $uploadDirectory . '/' . $trick->getImages();
 
-        $this->filesystem->remove($imagePath);
+        if ($this->filesystem->exists($imagePath)) {
+            try {
+                $this->filesystem->remove($imagePath);
+            } catch (IOExceptionInterface $exception) {
+                $this->addFlash("error", "Une erreur est survenue lors de la suppression de l'image.");
+                return $this->redirectToRoute('home.index');
+            }
+        }
 
         $this->entityManager->remove($trick);
         $this->entityManager->flush();
@@ -134,10 +115,6 @@ class TrickController extends AbstractController
         return $this->redirectToRoute('home.index');
     }
 
-    /**
-     * @param Request $request
-     * @return JsonResponse
-     */
     public function addComment(Request $request): JsonResponse
     {
         $user = $this->getUser();
