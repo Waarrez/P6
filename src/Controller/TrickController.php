@@ -116,6 +116,7 @@ class TrickController extends AbstractController
         }
 
         $comments = $trick->getComments();
+
         if ($comments) {
             foreach ($comments as $comment) {
                 $this->entityManager->remove($comment);
@@ -124,13 +125,7 @@ class TrickController extends AbstractController
 
         $imagePath = $this->getParameter('upload_directory') . '/' . $trick->getImages();
 
-        if (file_exists($imagePath)) {
-            try {
-                $this->filesystem->remove($imagePath);
-            } catch (\Exception $e) {
-                $this->addFlash('error', 'Une erreur est survenue lors de la suppression de l\'image.');
-            }
-        }
+        $this->filesystem->remove($imagePath);
 
         $this->entityManager->remove($trick);
         $this->entityManager->flush();
