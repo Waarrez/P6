@@ -1,0 +1,69 @@
+@startuml
+
+entity "Comment" {
+  +id: string
+  +content: string
+  +username: string
+  +getTrick(): Trick
+  +setTrick(trick: Trick): void
+}
+
+entity "Group" {
+  +id: string
+  +name: string
+  +getTricks(): Collection<Trick>
+  +addTrick(trick: Trick): void
+  +removeTrick(trick: Trick): void
+}
+
+entity "Images" {
+  +id: int
+  +name: string
+  +getTricks(): Trick
+  +setTricks(trick: Trick): void
+}
+
+entity "Trick" {
+  +id: string
+  +name: string
+  +content: string
+  +images: string
+  +medias: string
+  +imageFile: UploadedFile
+  +createdAt: \DateTimeImmutable
+  +editAt: \DateTimeImmutable
+  +getGroups(): Group
+  +setGroups(groups: Group): void
+  +getComments(): Collection<Comment>
+  +addComment(comment: Comment): void
+  +removeComment(comment: Comment): void
+  +getImagesTrick(): Collection<Images>
+  +addImagesTrick(imagesTrick: Images): void
+  +removeImagesTrick(imagesTrick: Images): void
+}
+
+entity "User" {
+  +id: string
+  +username: string
+  +roles: array
+  +password: string
+  +email: string
+  +confirmAccount: string
+  +getUserIdentifier(): string
+  +getRoles(): array
+  +setRoles(roles: array): void
+  +getPassword(): string
+  +setPassword(password: string): void
+  +eraseCredentials(): void
+  +getEmail(): string
+  +setEmail(email: string): void
+  +getConfirmAccount(): string
+  +setConfirmAccount(confirmAccount: string): void
+}
+
+Comment "1" --> "0..*" Trick: trick
+Trick "0..*" --> "1" Group: groups
+Trick "0..*" --> "1" Images: imagesTrick
+Trick "0..*" --> "0..*" Comment: comments
+
+@enduml

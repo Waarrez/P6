@@ -6,7 +6,7 @@ controllers:
 
 add_comment:
     path: /add-comment
-    controller: 'App\Controller\HomeController::addComment'
+    controller: 'App\Controller\TrickController::addComment'
     methods: ['POST']
 
 showMoreTricks:

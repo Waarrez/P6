@@ -60,6 +60,9 @@ class Trick
     #[ORM\OneToMany(mappedBy: 'tricks', targetEntity: Images::class, orphanRemoval: true)]
     private Collection $imagesTrick;
 
+    #[ORM\Column(length: 255)]
+    private ?string $slug = null;
+
     public function __construct()
     {
         $this->id = Ulid::generate();
@@ -186,11 +189,9 @@ class Trick
 
     public function removeComment(Comment $comment): static
     {
-        if ($this->comments->removeElement($comment)) {
-            // set the owning side to null (unless already changed)
-            if ($comment->getTrick() === $this) {
-                $comment->setTrick(null);
-            }
+        // set the owning side to null (unless already changed)
+        if ($this->comments->removeElement($comment) && $comment->getTrick() === $this) {
+            $comment->setTrick(null);
         }
 
         return $this;
@@ -216,12 +217,22 @@ class Trick
 
     public function removeImagesTrick(Images $imagesTrick): static
     {
-        if ($this->imagesTrick->removeElement($imagesTrick)) {
-            // set the owning side to null (unless already changed)
-            if ($imagesTrick->getTricks() === $this) {
-                $imagesTrick->setTricks(null);
-            }
+        // set the owning side to null (unless already changed)
+        if ($this->imagesTrick->removeElement($imagesTrick) === true && $imagesTrick->getTricks() === $this) {
+            $imagesTrick->setTricks(null);
         }
+
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): static
+    {
+        $this->slug = $slug;
 
         return $this;
     }

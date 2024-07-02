@@ -67,11 +67,9 @@ class Group
 
     public function removeTrick(Trick $trick): static
     {
-        if ($this->tricks->removeElement($trick)) {
-            // set the owning side to null (unless already changed)
-            if ($trick->getGroups() === $this) {
-                $trick->setGroups(null);
-            }
+        // set the owning side to null (unless already changed)
+        if ($this->tricks->removeElement($trick) === true && $trick->getGroups() === $this) {
+            $trick->setGroups(null);
         }
 
         return $this;

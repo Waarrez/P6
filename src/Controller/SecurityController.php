@@ -29,7 +29,7 @@ class SecurityController extends AbstractController
     #[Route(path: '/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
-        if ($this->getUser()) {
+        if ($this->getUser() instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             return $this->redirectToRoute('home.index');
         }
 
@@ -51,7 +51,7 @@ class SecurityController extends AbstractController
     public function confirmAccount(string $token) : ?\Symfony\Component\HttpFoundation\RedirectResponse
     {
 
-        if($token) {
+        if($token !== '' && $token !== '0') {
 
             $user = $this->userRepository->findOneBy(["confirmAccount" => $token]);
 
@@ -74,7 +74,7 @@ class SecurityController extends AbstractController
     #[Route('/register', name: 'home.register')]
     public function register(Request $request) : Response {
 
-        if($this->getUser()) {
+        if($this->getUser() instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             return $this->redirectToRoute("home.index");
         }
 
@@ -129,14 +129,10 @@ class SecurityController extends AbstractController
 
                 $mail = new MailJet();
 
-                if($session->get('code') === "") {
-                    if($code) {
-                        $mail->sendCode($user->getEmail(), $user->getUsername(), $code);
-
-                        $session->set('code', $code);
-
-                        return $this->redirectToRoute('home.confirmCode');
-                    }
+                if ($session->get('code') === "") {
+                    $mail->sendCode($user->getEmail(), $user->getUsername(), $code);
+                    $session->set('code', $code);
+                    return $this->redirectToRoute('home.confirmCode');
                 } else {
                     return $this->redirectToRoute('home.index');
                 }

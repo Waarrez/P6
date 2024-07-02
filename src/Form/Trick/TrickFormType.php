@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Form;
+namespace App\Form\Trick;
 
 use App\Entity\Group;
-use App\Entity\Images;
 use App\Entity\Trick;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
