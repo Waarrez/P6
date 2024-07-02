@@ -24,10 +24,10 @@ class TrickRepository extends ServiceEntityRepository
 
     /**
      * @param string $slug
-     * @return Trick
+     * @return Trick|null
      * @throws NonUniqueResultException
      */
-    public function getTrickBySlug(string $slug) : Trick {
+    public function getTrickBySlug(string $slug) : ?Trick {
         return $this->createQueryBuilder('t')
             ->andWhere('t.slug = :slug')
             ->setParameter('slug', $slug)

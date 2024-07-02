@@ -13,3 +13,9 @@ showMoreTricks:
     path: /show-more-tricks
     controller: 'App\Controller\HomeController::showMoreTricks'
     methods: [ 'GET' ]
+
+not_found:
+    path: /{wildcard}
+    controller: App\Controller\ErrorController::error404
+    requirements:
+        wildcard: ".*"

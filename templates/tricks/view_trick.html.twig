@@ -37,10 +37,18 @@
             {% endfor %}
 
             <h2 class="text-center mt-5 mb-5">Ecrire un commentaire</h2>
-            <form class="d-flex align-items-center p-3 mt-5" id="commentForm">
-                <input id="content" type="text" class="form-control">
-                <button class="btn btn-primary">Envoyer</button>
-            </form>
+            {% if app.user %}
+                <form class="d-flex align-items-center p-3 mt-5" id="commentForm">
+                    <input id="content" type="text" class="form-control">
+                    <button class="btn btn-primary">Envoyer</button>
+                </form>
+            {% else %}
+                <div class="container">
+                    <div class="alert alert-warning">
+                        Vous devez être connecté pour écrire un commentaire
+                    </div>
+                </div>
+            {% endif %}
         </div>
 
         <hr class="mt-5" style="width: 50%; ">

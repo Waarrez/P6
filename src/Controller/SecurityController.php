@@ -72,36 +72,40 @@ class SecurityController extends AbstractController
      * @throws Exception
      */
     #[Route('/register', name: 'home.register')]
-    public function register(Request $request) : Response {
-
-        if($this->getUser() instanceof \Symfony\Component\Security\Core\User\UserInterface) {
-            return $this->redirectToRoute("home.index");
+    public function register(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        // Vérifier si l'utilisateur est déjà connecté
+        if ($this->getUser() instanceof User) {
+            return $this->redirectToRoute('home.index');
         }
 
         $user = new User();
-        $mail = new MailJet();
 
         $registerForm = $this->createForm(RegisterFormType::class, $user);
 
         $registerForm->handleRequest($request);
 
-        if($registerForm->isSubmitted() && $registerForm->isValid()) {
-            $token = bin2hex(random_bytes(16));
+        if ($registerForm->isSubmitted() && $registerForm->isValid()) {
+            try {
+                $token = bin2hex(random_bytes(16));
+                $user->setConfirmAccount($token);
 
-            $user->setConfirmAccount($token);
-            $password = $user->getPassword();
-            $hashPass = $this->hasher->hashPassword($user, $password);
-            $user->setPassword($hashPass);
+                $hashedPassword = $this->hasher->hashPassword($user, $user->getPassword());
+                $user->setPassword($hashedPassword);
 
-            $mail->send($user->getEmail(), $user->getUsername(), $token);
+                $entityManager->persist($user);
+                $entityManager->flush();
 
-            $this->addFlash('success', 'Votre inscription à bien été enregistré, un mail de confirmation va être envoyé');
-            $this->manager->persist($user);
-            $this->manager->flush();
+                $this->addFlash('success', 'Votre inscription a bien été enregistrée. Un email de confirmation va être envoyé.');
+            } catch (Exception $e) {
+
+                $this->addFlash('error', "Le nom d'utilisateur ".$user->getUsername()." est déja utilisé !");
+            }
         }
 
+        // Affichage du formulaire de registre
         return $this->render('account/register.html.twig', [
-            'registerForm' => $registerForm->createView()
+            'registerForm' => $registerForm->createView(),
         ]);
     }
 
@@ -123,15 +127,13 @@ class SecurityController extends AbstractController
             $user = $this->userRepository->findOneBy(['email' => $email]);
             $session->set('email', $email);
 
-            if($user) {
+            if($user !== null) {
                 $state = true;
                 $code = random_int(1000, 9999);
 
-                $mail = new MailJet();
-
                 if ($session->get('code') === "") {
-                    $mail->sendCode($user->getEmail(), $user->getUsername(), $code);
                     $session->set('code', $code);
+                    $this->addFlash("success", "Un code de confirmation vient d'être envoyé au mail suivant : ".$user->getEmail());
                     return $this->redirectToRoute('home.confirmCode');
                 } else {
                     return $this->redirectToRoute('home.index');
