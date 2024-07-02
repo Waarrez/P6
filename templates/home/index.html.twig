@@ -6,11 +6,13 @@
     <div>
         <img width="100%" src="{{ asset("img/fond.jpg") }}" alt="">
     </div>
-    {% for message in app.flashes('success') %}
-        <div class="alert alert-success">
-            {{ message }}
-        </div>
-    {% endfor %}
+    <div class="container mt-5 mb-5">
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
     <div id="card" style="margin-top: 150px" class="container-fluid d-flex justify-content-around flex-wrap mb-5">
         {% if tricks != [] %}
             {% for trick in tricks %}
