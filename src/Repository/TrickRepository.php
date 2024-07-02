@@ -23,6 +23,8 @@ class TrickRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param string $slug
+     * @return Trick
      * @throws NonUniqueResultException
      */
     public function getTrickBySlug(string $slug) : Trick {

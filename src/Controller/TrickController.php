@@ -51,6 +51,8 @@ class TrickController extends AbstractController
     }
 
     /**
+     * @param string $slug
+     * @return Response
      * @throws NonUniqueResultException
      */
     #[Route('/trick/detail/{slug}', name: "home.viewTrick")]

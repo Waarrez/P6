@@ -218,7 +218,7 @@ class Trick
     public function removeImagesTrick(Images $imagesTrick): static
     {
         // set the owning side to null (unless already changed)
-        if ($this->imagesTrick->removeElement($imagesTrick) && $imagesTrick->getTricks() === $this) {
+        if ($this->imagesTrick->removeElement($imagesTrick) === true && $imagesTrick->getTricks() === $this) {
             $imagesTrick->setTricks(null);
         }
 

@@ -14,19 +14,26 @@ use Symfony\Component\String\Slugger\AsciiSlugger;
 
 final class TrickHandler
 {
-    public function __construct(private FormFactoryInterface $formFactory, private EntityManagerInterface $entityManager)
+    /**
+     * @param FormFactoryInterface $formFactory
+     * @param EntityManagerInterface $entityManager
+     */
+    public function __construct(private readonly FormFactoryInterface $formFactory, private readonly EntityManagerInterface $entityManager)
     {
-    }
+    } // end __construct()
+
 
     /**
      * @param array<string, mixed> $options
      * @return FormInterface<string, FormInterface>
      */
-    public function prepare(Trick $data = null, array $options = []): FormInterface {
+    public function prepare(Trick $data = null, array $options = []): FormInterface
+    {
         return $this->formFactory->create(TrickFormType::class, $data, $options);
     }
 
-    public function handle(FormInterface $form, Request $request, Trick $trick, string $upload_directory, bool $isEdit = false): bool {
+    public function handle(FormInterface $form, Request $request, Trick $trick, string $upload_directory, bool $isEdit = false): bool
+    {
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -55,13 +62,13 @@ final class TrickHandler
                 }
             }
 
-            if ($file) {
+            if ($file !== null) {
                 $newFileName = uniqid().'.'.$file->guessExtension();
 
                 try {
                     $file->move($upload_directory, $newFileName);
-                } catch (FileException) {
-                    // Handle the exception, log or throw it
+                } catch (FileException $e) {
+                    error_log($e->getMessage());
                 }
 
                 $trick->setImages($newFileName);
@@ -90,5 +97,6 @@ final class TrickHandler
 
         $slugger = new AsciiSlugger();
         return $slugger->slug($slug);
+
     }
 }
