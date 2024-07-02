@@ -102,7 +102,7 @@ class TrickController extends AbstractController
         if ($this->filesystem->exists($imagePath)) {
             try {
                 $this->filesystem->remove($imagePath);
-            } catch (IOExceptionInterface $exception) {
+            } catch (IOExceptionInterface) {
                 $this->addFlash("error", "Une erreur est survenue lors de la suppression de l'image.");
                 return $this->redirectToRoute('home.index');
             }

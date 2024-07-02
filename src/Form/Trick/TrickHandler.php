@@ -12,15 +12,8 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 final class TrickHandler
 {
-    private FormFactoryInterface $formFactory;
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(
-        FormFactoryInterface $formFactory,
-        EntityManagerInterface $entityManager,
-    ) {
-        $this->formFactory = $formFactory;
-        $this->entityManager = $entityManager;
+    public function __construct(private FormFactoryInterface $formFactory, private EntityManagerInterface $entityManager)
+    {
     }
 
     /**
@@ -31,14 +24,6 @@ final class TrickHandler
         return $this->formFactory->create(TrickFormType::class, $data, $options);
     }
 
-    /**
-     * @param FormInterface $form
-     * @param Request $request
-     * @param Trick $trick
-     * @param string $upload_directory
-     * @param bool $isEdit
-     * @return bool
-     */
     public function handle(FormInterface $form, Request $request, Trick $trick, string $upload_directory, bool $isEdit = false): bool {
         $form->handleRequest($request);
 
@@ -59,7 +44,7 @@ final class TrickHandler
                     $trick->addImagesTrick($imagesTricks);
 
                     $this->entityManager->persist($imagesTricks);
-                } catch (FileException $e) {
+                } catch (FileException) {
                     // Handle the exception, log or throw it
                 }
             }
@@ -69,7 +54,7 @@ final class TrickHandler
 
                 try {
                     $file->move($upload_directory, $newFileName);
-                } catch (FileException $e) {
+                } catch (FileException) {
                     // Handle the exception, log or throw it
                 }
 
