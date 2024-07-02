@@ -31,12 +31,13 @@ class TrickController extends AbstractController
         $tricks = $this->trickRepository->findAll();
 
         return $this->render('tricks/tricks.html.twig', [
-            'tricks' => $tricks
+            'tricks' => $tricks,
         ]);
     }
 
     #[Route('/addTrick', name: 'addTrick')]
-    public function addTrick(Request $request): Response {
+    public function addTrick(Request $request): Response
+    {
         $trick = new Trick();
         $form = $this->trickHandler->prepare($trick);
 
@@ -53,13 +54,14 @@ class TrickController extends AbstractController
      * @throws NonUniqueResultException
      */
     #[Route('/trick/detail/{slug}', name: "home.viewTrick")]
-    public function viewTrick(string $slug): Response {
+    public function viewTrick(string $slug): Response
+    {
         $trick = $this->trickRepository->getTrickBySlug($slug);
         $comments = $trick->getComments();
 
         return $this->render('tricks/view_trick.html.twig', [
             'trick' => $trick,
-            'comments' => $comments
+            'comments' => $comments,
         ]);
     }
 
@@ -67,9 +69,9 @@ class TrickController extends AbstractController
      * @throws NonUniqueResultException
      */
     #[Route('/trick/edit/{slug}', name: "editTrick")]
-    public function editTrick(string $slug, Request $request): Response {
+    public function editTrick(string $slug, Request $request): Response
+    {
         $trick = $this->trickRepository->getTrickBySlug($slug);
-
         $form = $this->trickHandler->prepare($trick);
 
         if ($this->trickHandler->handle($form, $request, $trick, $this->getParameter("upload_directory"), true)) {
@@ -77,7 +79,7 @@ class TrickController extends AbstractController
         }
 
         return $this->render('tricks/edit_trick.html.twig', [
-            'form' => $form->createView()
+            'form' => $form->createView(),
         ]);
     }
 
