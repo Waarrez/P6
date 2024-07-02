@@ -11,7 +11,7 @@
 
     {% if trick.medias %}
         <div class="mt-5 d-flex align-items-center justify-content-around">
-            <iframe src="{{ trick.medias }}" frameborder="0"></iframe>
+            <iframe width="560" height="315" src="{{ trick.medias }}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
             {% if trick.imagesTrick %}
                 {% for imagesTrick in trick.imagesTrick  %}
                     <img width="20%" src="{{ asset('uploads/tricksImg/' ~ imagesTrick.name ) }}" alt="">
@@ -64,14 +64,18 @@
     <script type="module">
         let url = window.location.href;
 
-        // Utilisez une expression régulière pour extraire l'ID
-        let idMatches = url.match(/\/trick\/detail\/([^\/]+)$/);
-        let id = idMatches && idMatches[1];
+        let slugMatches = url.match(/\/trick\/detail\/([^\/]+)$/);
+        let slug = slugMatches && slugMatches[1];
 
         document.getElementById('commentForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Empêche la soumission du formulaire par défaut
+            event.preventDefault();
 
-            const content = document.getElementById('content').value;
+            const content = document.getElementById('content').value.trim(); // trim() enlève les espaces en début et fin
+
+            if (content === '') {
+                alert('Veuillez entrer un commentaire.');
+                return;
+            }
 
             let xhttp = new XMLHttpRequest();
 
@@ -81,26 +85,25 @@
                     let message = response.message;
                     let newComments = response.comments;
 
-                    // Mettez à jour la liste des commentaires
                     let commentairesDiv = document.getElementById('commentaires');
                     commentairesDiv.innerHTML = '';
-                    commentairesDiv.innerHTML = '<div class="alert alert-success">Votre commentaire à bien été ajouté !</div>'
+                    commentairesDiv.innerHTML = '<div class="alert alert-success">Votre commentaire a bien été ajouté !</div>';
 
                     newComments.forEach(function(comment) {
                         let newCommentDiv = document.createElement('div');
                         newCommentDiv.classList.add('d-flex', 'align-items-center', 'p-3', 'mt-5');
                         newCommentDiv.style.backgroundColor = '#f7f7f9';
                         newCommentDiv.innerHTML = `
-                <span class="badge bg-primary" style="margin-left: 20px">${comment.username}</span>
-                <p style="margin-left: 100px; margin-bottom: 0">${comment.content}</p>`;
+                    <span class="badge bg-primary" style="margin-left: 20px">${comment.username}</span>
+                    <p style="margin-left: 100px; margin-bottom: 0">${comment.content}</p>`;
                         commentairesDiv.appendChild(newCommentDiv);
                     });
                 }
             };
 
-            xhttp.open('POST', '/add-comment', true); // Assurez-vous d'indiquer le bon chemin pour l'ajout de commentaire
+            xhttp.open('POST', '/add-comment', true);
             xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-            xhttp.send('id=' + id + '&content=' + content);
+            xhttp.send('slug=' + slug + '&content=' + content);
         });
 
         let comments = document.getElementsByClassName("comments");
@@ -114,7 +117,6 @@
             }
             buttonShow.classList.add("noneButton");
         });
-
     </script>
 
 {% endblock %}

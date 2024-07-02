@@ -9,6 +9,8 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\String\AbstractUnicodeString;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 
 final class TrickHandler
 {
@@ -30,6 +32,10 @@ final class TrickHandler
         if ($form->isSubmitted() && $form->isValid()) {
             $file = $form->get('imageFile')->getData();
             $files = $form->get('images')->getData();
+            $name = $form->get('name')->getData();
+
+            $slug = $this->setSlugForName($name);
+            $trick->setSlug($slug);
 
             foreach ($files as $images) {
                 $newFileName = uniqid().'.'.$images->guessExtension();
@@ -77,5 +83,12 @@ final class TrickHandler
         }
 
         return false;
+    }
+
+    private function setSlugForName(string $slug): AbstractUnicodeString
+    {
+
+        $slugger = new AsciiSlugger();
+        return $slugger->slug($slug);
     }
 }

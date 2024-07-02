@@ -7,6 +7,7 @@ use App\Entity\Trick;
 use App\Form\Trick\TrickHandler;
 use App\Repository\TrickRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\NonUniqueResultException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
@@ -48,9 +49,12 @@ class TrickController extends AbstractController
         ]);
     }
 
-    #[Route('/trick/detail/{id}', name: "home.viewTrick")]
-    public function viewTrick(string $id): Response {
-        $trick = $this->trickRepository->find($id);
+    /**
+     * @throws NonUniqueResultException
+     */
+    #[Route('/trick/detail/{slug}', name: "home.viewTrick")]
+    public function viewTrick(string $slug): Response {
+        $trick = $this->trickRepository->getTrickBySlug($slug);
         $comments = $trick->getComments();
 
         return $this->render('tricks/view_trick.html.twig', [
@@ -59,14 +63,12 @@ class TrickController extends AbstractController
         ]);
     }
 
-    #[Route('/trick/edit/{id}', name: "editTrick")]
-    public function editTrick(string $id, Request $request): Response {
-        $trick = $this->trickRepository->find($id);
-
-        if (!$trick) {
-            $this->addFlash("error", "La figure n'existe pas !");
-            return $this->redirectToRoute("home.index");
-        }
+    /**
+     * @throws NonUniqueResultException
+     */
+    #[Route('/trick/edit/{slug}', name: "editTrick")]
+    public function editTrick(string $slug, Request $request): Response {
+        $trick = $this->trickRepository->getTrickBySlug($slug);
 
         $form = $this->trickHandler->prepare($trick);
 
@@ -115,12 +117,15 @@ class TrickController extends AbstractController
         return $this->redirectToRoute('home.index');
     }
 
+    /**
+     * @throws NonUniqueResultException
+     */
     public function addComment(Request $request): JsonResponse
     {
         $user = $this->getUser();
         $content = $request->request->get('content');
-        $id = $request->request->get('id');
-        $trick = $this->trickRepository->find($id);
+        $slug = $request->request->get('slug');
+        $trick = $this->trickRepository->getTrickBySlug($slug);
 
         $comment = new Comment();
         $comment->setContent($content);
