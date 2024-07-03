@@ -9,12 +9,19 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ErrorController extends AbstractController
 {
+    /**
+     * @return Response
+     */
     #[Route('/error404', name: 'error404')]
     public function error404(): Response
     {
         return $this->render('error/error404.html.twig');
     }
 
+    /**
+     * @param HttpExceptionInterface $exception
+     * @return Response
+     */
     public function error(HttpExceptionInterface $exception): Response
     {
         $statusCode = $exception->getStatusCode();
@@ -26,7 +33,7 @@ class ErrorController extends AbstractController
         };
 
         return $this->render('error/error.html.twig', [
-            'message' => $message,
+            'message'     => $message,
             'status_code' => $statusCode,
         ]);
     }

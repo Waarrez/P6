@@ -14,7 +14,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordC
 
 /**
  * @extends ServiceEntityRepository<User>
-* @implements PasswordUpgraderInterface<User>
+ * @implements PasswordUpgraderInterface<User>
  *
  * @method User|null find($id, $lockMode = null, $lockVersion = null)
  * @method User|null findOneBy(array $criteria, array $orderBy = null)
@@ -23,13 +23,21 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordC
  */
 class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
+    /**
+     * @var UserPasswordHasherInterface
+     */
     private UserPasswordHasherInterface $passwordHasher;
 
+    /**
+     * @param ManagerRegistry $registry
+     * @param UserPasswordHasherInterface $passwordHasher
+     */
     public function __construct(ManagerRegistry $registry, UserPasswordHasherInterface $passwordHasher)
     {
         parent::__construct($registry, User::class);
         $this->passwordHasher = $passwordHasher;
     }
+
 
     /**
      * Used to upgrade (rehash) the user's password automatically over time.
@@ -45,6 +53,11 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
+    /**
+     * @param UserInterface $user
+     * @param PasswordCredentials $credentials
+     * @return bool
+     */
     public function checkCredentials(UserInterface $user, PasswordCredentials $credentials): bool
     {
         $plainPassword = $credentials->getPassword();

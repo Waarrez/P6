@@ -39,14 +39,14 @@ class LoginAuthenticator extends AbstractLoginFormAuthenticator
             throw new CustomUserMessageAuthenticationException('Nom d\'utilisateur incorrect.');
         }
 
-        if($user->getConfirmAccount() !== "") {
+        if ($user->getConfirmAccount() !== "") {
             throw new CustomUserMessageAuthenticationException('Votre compte n\'est pas confirmé.');
         }
 
         $password = $request->request->get('password', '');
         $credentials = new PasswordCredentials($password);
 
-        if (!$this->userRepository->checkCredentials($user, $credentials)) {
+        if ($this->userRepository->checkCredentials($user, $credentials) === FALSE) {
             throw new CustomUserMessageAuthenticationException('Mot de passe incorrect.');
         }
 

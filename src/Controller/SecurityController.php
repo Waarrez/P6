@@ -98,7 +98,6 @@ class SecurityController extends AbstractController
 
                 $this->addFlash('success', 'Votre inscription a bien été enregistrée. Un email de confirmation va être envoyé.');
             } catch (Exception $e) {
-
                 $this->addFlash('error', "Le nom d'utilisateur ".$user->getUsername()." est déja utilisé !");
             }
         }
