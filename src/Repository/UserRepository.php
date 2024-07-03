@@ -29,6 +29,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     private UserPasswordHasherInterface $passwordHasher;
 
     /**
+     * Constructor.
+     *
      * @param ManagerRegistry $registry
      * @param UserPasswordHasherInterface $passwordHasher
      */
@@ -41,6 +43,10 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
     /**
      * Used to upgrade (rehash) the user's password automatically over time.
+     *
+     * @param PasswordAuthenticatedUserInterface $user
+     * @param string $newHashedPassword
+     * @throws UnsupportedUserException if the user is not an instance of User
      */
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
     {
@@ -53,7 +59,10 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
+
     /**
+     * Checks user credentials.
+     *
      * @param UserInterface $user
      * @param PasswordCredentials $credentials
      * @return bool

@@ -51,7 +51,7 @@ class SecurityController extends AbstractController
     public function confirmAccount(string $token) : ?\Symfony\Component\HttpFoundation\RedirectResponse
     {
 
-        if($token !== '' && $token !== '0') {
+        if ($token !== '' && $token !== '0') {
 
             $user = $this->userRepository->findOneBy(["confirmAccount" => $token]);
 
@@ -74,7 +74,6 @@ class SecurityController extends AbstractController
     #[Route('/register', name: 'home.register')]
     public function register(Request $request, EntityManagerInterface $entityManager): Response
     {
-        // Vérifier si l'utilisateur est déjà connecté
         if ($this->getUser() instanceof User) {
             return $this->redirectToRoute('home.index');
         }
@@ -122,11 +121,11 @@ class SecurityController extends AbstractController
 
         $session->set('code', '');
 
-        if($request->isMethod('POST')) {
+        if ($request->isMethod('POST')) {
             $user = $this->userRepository->findOneBy(['email' => $email]);
             $session->set('email', $email);
 
-            if($user !== null) {
+            if ($user !== null) {
                 $state = true;
                 $code = random_int(1000, 9999);
 
@@ -151,7 +150,7 @@ class SecurityController extends AbstractController
     #[Route("/confirmCode", name: "home.confirmCode")]
     public function confirmCode(SessionInterface $session, Request $request) : Response {
 
-       if($session->get('code') !== null) {
+       if ($session->get('code') !== null) {
            if ($request->isMethod('POST')) {
 
                $code = $request->request->get('code');
@@ -175,8 +174,8 @@ class SecurityController extends AbstractController
     #[Route("/newPassword", name: "home.newPassword")]
     public function addNewPassword(Request $request, SessionInterface $session) : Response {
 
-        if($session->get('code') === true) {
-            if($request->isMethod("POST")) {
+        if ($session->get('code') === true) {
+            if ($request->isMethod("POST")) {
                 $password = $request->request->get('password');
 
                 $email = $session->get('email');
