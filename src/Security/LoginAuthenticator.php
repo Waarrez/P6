@@ -33,11 +33,21 @@ class LoginAuthenticator extends AbstractLoginFormAuthenticator
 
         $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $username);
 
-        // Récupérer l'utilisateur depuis la base de données
         $user = $this->userRepository->findOneBy(['username' => $username]);
 
-        if(!$user || $user->getConfirmAccount() !== "") {
+        if ($user === false) {
+            throw new CustomUserMessageAuthenticationException('Nom d\'utilisateur incorrect.');
+        }
+
+        if ($user->getConfirmAccount() !== "") {
             throw new CustomUserMessageAuthenticationException('Votre compte n\'est pas confirmé.');
+        }
+
+        $password = $request->request->get('password', '');
+        $credentials = new PasswordCredentials($password);
+
+        if ($this->userRepository->checkCredentials($user, $credentials) === FALSE) {
+            throw new CustomUserMessageAuthenticationException('Mot de passe incorrect.');
         }
 
         return new Passport(

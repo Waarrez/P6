@@ -42,7 +42,8 @@ class TrickController extends AbstractController
         $form = $this->trickHandler->prepare($trick);
 
         if ($this->trickHandler->handle($form, $request, $trick, $this->getParameter("upload_directory"))) {
-            return $this->redirectToRoute('home.index');
+            $this->addFlash("success", "La figure à bien été ajouté !");
+            return $this->redirectToRoute('tricks');
         }
 
         return $this->render('tricks/add_trick.html.twig', [
@@ -74,9 +75,16 @@ class TrickController extends AbstractController
     public function editTrick(string $slug, Request $request): Response
     {
         $trick = $this->trickRepository->getTrickBySlug($slug);
+
+        if ($trick === null) {
+            $this->addFlash("error", "La figure avec le slug '$slug' n'existe pas.");
+            return $this->redirectToRoute('tricks');
+        }
+
         $form = $this->trickHandler->prepare($trick);
 
         if ($this->trickHandler->handle($form, $request, $trick, $this->getParameter("upload_directory"), true)) {
+            $this->addFlash("success", "La figure a bien été modifiée !");
             return $this->redirectToRoute('home.index');
         }
 
@@ -92,7 +100,7 @@ class TrickController extends AbstractController
 
         if (!$trick) {
             $this->addFlash("error", "La figure n'existe pas !");
-            return $this->redirectToRoute('home.index');
+            return $this->redirectToRoute('tricks');
         }
 
         $comments = $trick->getComments();
@@ -118,7 +126,7 @@ class TrickController extends AbstractController
         $this->entityManager->flush();
 
         $this->addFlash("success", "La figure a été supprimée avec succès !");
-        return $this->redirectToRoute('home.index');
+        return $this->redirectToRoute('tricks');
     }
 
     /**
