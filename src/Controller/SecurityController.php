@@ -174,7 +174,7 @@ class SecurityController extends AbstractController
     public function addNewPassword(Request $request, SessionInterface $session) : Response {
 
         if ($session->get('code') === true) {
-            if ($request->isMethod("POST")) {
+            if ($request->isMethod("POST") === true) {
                 $password = $request->request->get('password');
 
                 $email = $session->get('email');
