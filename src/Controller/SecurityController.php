@@ -101,7 +101,6 @@ class SecurityController extends AbstractController
             }
         }
 
-        // Affichage du formulaire de registre
         return $this->render('account/register.html.twig', [
             'registerForm' => $registerForm->createView(),
         ]);
@@ -121,7 +120,7 @@ class SecurityController extends AbstractController
 
         $session->set('code', '');
 
-        if ($request->isMethod('POST')) {
+        if ($request->isMethod('POST') === true) {
             $user = $this->userRepository->findOneBy(['email' => $email]);
             $session->set('email', $email);
 

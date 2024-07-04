@@ -19,8 +19,10 @@ class ErrorController extends AbstractController
     }
 
     /**
-     * @param HttpExceptionInterface $exception
-     * @return Response
+     * Handle HTTP exceptions and return an appropriate error response.
+     *
+     * @param HttpExceptionInterface $exception The exception that triggered the error.
+     * @return Response The response object with the rendered error page.
      */
     public function error(HttpExceptionInterface $exception): Response
     {
