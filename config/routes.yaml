@@ -9,11 +9,6 @@ add_comment:
     controller: 'App\Controller\TrickController::addComment'
     methods: ['POST']
 
-showMoreTricks:
-    path: /show-more-tricks
-    controller: 'App\Controller\HomeController::showMoreTricks'
-    methods: [ 'GET' ]
-
 not_found:
     path: /{wildcard}
     controller: App\Controller\ErrorController::error404
