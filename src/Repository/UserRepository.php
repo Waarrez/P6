@@ -14,7 +14,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordC
 
 /**
  * @extends ServiceEntityRepository<User>
-* @implements PasswordUpgraderInterface<User>
+ * @implements PasswordUpgraderInterface<User>
  *
  * @method User|null find($id, $lockMode = null, $lockVersion = null)
  * @method User|null findOneBy(array $criteria, array $orderBy = null)
@@ -23,13 +23,23 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordC
  */
 class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
+    /**
+     * @var UserPasswordHasherInterface
+     */
     private UserPasswordHasherInterface $passwordHasher;
 
+    /**
+     * Constructor.
+     *
+     * @param ManagerRegistry $registry
+     * @param UserPasswordHasherInterface $passwordHasher
+     */
     public function __construct(ManagerRegistry $registry, UserPasswordHasherInterface $passwordHasher)
     {
         parent::__construct($registry, User::class);
         $this->passwordHasher = $passwordHasher;
     }
+
 
     /**
      * @param PasswordAuthenticatedUserInterface $user
@@ -37,6 +47,12 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      * @return void
      * Used to upgrade (rehash) the user's password automatically over time.
      *
+<<<<<<< HEAD
+=======
+     * @param PasswordAuthenticatedUserInterface $user
+     * @param string $newHashedPassword
+     * @throws UnsupportedUserException if the user is not an instance of User
+>>>>>>> 6e95ee42dfd32366930bf97137133079305a4aac
      */
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
     {
@@ -49,6 +65,14 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
+
+    /**
+     * Checks user credentials.
+     *
+     * @param UserInterface $user
+     * @param PasswordCredentials $credentials
+     * @return bool
+     */
     public function checkCredentials(UserInterface $user, PasswordCredentials $credentials): bool
     {
         $plainPassword = $credentials->getPassword();
