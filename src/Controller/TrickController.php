@@ -74,7 +74,7 @@ class TrickController extends AbstractController
     {
         $trick = $this->trickRepository->getTrickBySlug($slug);
 
-        if (!$trick instanceof \App\Entity\Trick) {
+        if ($trick instanceof Trick === false) {
             $this->addFlash("error", "La figure avec le slug '$slug' n'existe pas.");
             return $this->redirectToRoute('tricks');
         }

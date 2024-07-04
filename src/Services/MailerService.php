@@ -40,7 +40,7 @@ class MailerService
             ->to($dst)
             ->subject($subject)
             ->text($content)
-            ->html('<p>' . $content . '</p> : <b>'.$code.'</b>');
+            ->html('<p>'.$content.'</p> : <b>'.$code.'</b>');
 
         $this->mailer->send($email);
     }
