@@ -36,7 +36,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      */
     public function __construct(ManagerRegistry $registry, UserPasswordHasherInterface $passwordHasher)
     {
-
         parent::__construct($registry, User::class);
         $this->passwordHasher = $passwordHasher;
     }
@@ -46,6 +45,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      * Used to upgrade (rehash) the user's password automatically over time.
      *
      * @param PasswordAuthenticatedUserInterface $user
+     *
      * @param string $newHashedPassword
      * @return void
      */
