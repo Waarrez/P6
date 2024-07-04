@@ -12,6 +12,12 @@
                 {{ message }}
             </div>
         {% endfor %}
+
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger text-center">
+                {{ message }}
+            </div>
+        {% endfor %}
     </div>
     <div id="card" style="margin-top: 150px" class="container-fluid d-flex justify-content-around flex-wrap mb-5">
         {% if tricks != [] %}
