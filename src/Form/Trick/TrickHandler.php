@@ -14,10 +14,6 @@ use Symfony\Component\String\Slugger\AsciiSlugger;
 
 final class TrickHandler
 {
-    /**
-     * @param FormFactoryInterface $formFactory
-     * @param EntityManagerInterface $entityManager
-     */
     public function __construct(private readonly FormFactoryInterface $formFactory, private readonly EntityManagerInterface $entityManager)
     {
     } // end __construct()

@@ -9,9 +9,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ErrorController extends AbstractController
 {
-    /**
-     * @return Response
-     */
     #[Route('/error404', name: 'error404')]
     public function error404(): Response
     {
