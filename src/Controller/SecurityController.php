@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Classes\MailJet;
+use App\Services\MailerService;
 use App\Entity\User;
 use App\Form\RegisterFormType;
 use App\Repository\UserRepository;
@@ -12,6 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
@@ -22,9 +23,9 @@ class SecurityController extends AbstractController
         private readonly UserRepository $userRepository,
         private readonly EntityManagerInterface $manager,
         private readonly UserPasswordHasherInterface $hasher,
+        private readonly MailerService $mailer
     )
     {}
-
 
     #[Route(path: '/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
@@ -47,29 +48,8 @@ class SecurityController extends AbstractController
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
 
-    #[Route(path: '/confirmAccount/{token}', name: 'app_confirm_account')]
-    public function confirmAccount(string $token) : ?\Symfony\Component\HttpFoundation\RedirectResponse
-    {
-
-        if ($token !== '' && $token !== '0') {
-
-            $user = $this->userRepository->findOneBy(["confirmAccount" => $token]);
-
-            $user->setConfirmAccount("");
-
-            $this->manager->persist($user);
-            $this->manager->flush();
-
-            $this->addFlash('success', "Votre compte est confirmé ! Vous pouvez dès à présent vous connecter.");
-
-            return $this->redirectToRoute('app_login');
-        }
-
-        return null;
-    }
-
     /**
-     * @throws Exception
+     * @throws Exception|TransportExceptionInterface
      */
     #[Route('/register', name: 'home.register')]
     public function register(Request $request, EntityManagerInterface $entityManager): Response
@@ -92,11 +72,18 @@ class SecurityController extends AbstractController
                 $hashedPassword = $this->hasher->hashPassword($user, $user->getPassword());
                 $user->setPassword($hashedPassword);
 
+                $this->mailer->sendEmail(
+                    $user->getEmail(),
+                    "Inscription sur snowtricks",
+                    "Merci pour votre inscription ! Voici le lien pour confirmer votre compte",
+                    $token
+                );
+
                 $entityManager->persist($user);
                 $entityManager->flush();
 
                 $this->addFlash('success', 'Votre inscription a bien été enregistrée. Un email de confirmation va être envoyé.');
-            } catch (Exception $e) {
+            } catch (Exception) {
                 $this->addFlash('error', "Le nom d'utilisateur ".$user->getUsername()." est déja utilisé !");
             }
         }
@@ -106,8 +93,32 @@ class SecurityController extends AbstractController
         ]);
     }
 
+    #[Route(path: '/confirmAccount/{token}', name: 'app_confirm_account')]
+    public function confirmAccount(string $token): ?Response
+    {
+        if ($token === '' || $token === '0') {
+            return $this->redirectToRoute('home.index');
+        }
+
+        $user = $this->userRepository->findOneBy(["confirmAccount" => $token]);
+
+        if ($user === true) {
+            $this->addFlash("error", "Le lien n'est plus disponible.");
+            return $this->redirectToRoute('home.index');
+        }
+
+        $user->setConfirmAccount("");
+
+        $this->manager->persist($user);
+        $this->manager->flush();
+
+        $this->addFlash('success', "Votre compte est confirmé ! Vous pouvez dès à présent vous connecter.");
+        return $this->redirectToRoute('app_login');
+    }
+
     /**
      * @throws Exception
+     * @throws TransportExceptionInterface
      */
     #[Route("/resetPassword", name: "home.resetPassword")]
     public function sendResetPassword(Request $request, SessionInterface $session): Response
@@ -120,7 +131,7 @@ class SecurityController extends AbstractController
 
         $session->set('code', '');
 
-        if ($request->isMethod('POST') === true) {
+        if ($request->isMethod('POST')) {
             $user = $this->userRepository->findOneBy(['email' => $email]);
             $session->set('email', $email);
 
@@ -130,6 +141,13 @@ class SecurityController extends AbstractController
 
                 if ($session->get('code') === "") {
                     $session->set('code', $code);
+                    $this->mailer->sendResetPasswordMail(
+                        $email,
+                        "Changement de mot de passe",
+                        "Merci de saisir le code",
+                        $code
+                    );
+
                     $this->addFlash("success", "Un code de confirmation vient d'être envoyé au mail suivant : ".$user->getEmail());
                     return $this->redirectToRoute('home.confirmCode');
                 } else {
@@ -149,7 +167,7 @@ class SecurityController extends AbstractController
     #[Route("/confirmCode", name: "home.confirmCode")]
     public function confirmCode(SessionInterface $session, Request $request) : Response {
 
-       if ($session->get('code') !== null) {
+       if ($session->get('code') !== "") {
            if ($request->isMethod('POST')) {
 
                $code = $request->request->get('code');
