@@ -27,7 +27,10 @@ class SecurityController extends AbstractController
     )
     {}
 
-
+    /**
+     * @param AuthenticationUtils $authenticationUtils
+     * @return Response
+     */
     #[Route(path: '/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
@@ -43,6 +46,9 @@ class SecurityController extends AbstractController
         return $this->render('security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);
     }
 
+    /**
+     * @return void
+     */
     #[Route(path: '/logout', name: 'app_logout')]
     public function logout(): void
     {
@@ -94,6 +100,10 @@ class SecurityController extends AbstractController
         ]);
     }
 
+    /**
+     * @param string $token
+     * @return Response|null
+     */
     #[Route(path: '/confirmAccount/{token}', name: 'app_confirm_account')]
     public function confirmAccount(string $token): ?Response
     {
@@ -103,7 +113,7 @@ class SecurityController extends AbstractController
 
         $user = $this->userRepository->findOneBy(["confirmAccount" => $token]);
 
-        if (!$user) {
+        if ($user === true) {
             $this->addFlash("error", "Le lien n'est plus disponible.");
             return $this->redirectToRoute('home.index');
         }
@@ -165,6 +175,11 @@ class SecurityController extends AbstractController
         ]);
     }
 
+    /**
+     * @param SessionInterface $session
+     * @param Request $request
+     * @return Response
+     */
     #[Route("/confirmCode", name: "home.confirmCode")]
     public function confirmCode(SessionInterface $session, Request $request) : Response {
 
@@ -189,6 +204,11 @@ class SecurityController extends AbstractController
         return $this->render('account/confirmResetPassword.html.twig');
     }
 
+    /**
+     * @param Request $request
+     * @param SessionInterface $session
+     * @return Response
+     */
     #[Route("/newPassword", name: "home.newPassword")]
     public function addNewPassword(Request $request, SessionInterface $session) : Response {
 
