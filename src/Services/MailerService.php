@@ -23,6 +23,8 @@ class MailerService
 
 
     /**
+     * Function for sending mail
+     *
      * @param string $to
      * @param string $subject
      * @param string $content
@@ -37,12 +39,17 @@ class MailerService
             ->to($to)
             ->subject($subject)
             ->text($content)
-            ->html('<p>' . $content . '</p> : <a href="http://127.0.0.1:8000/confirmAccount/'.$token.'">Lien de confirmation</a>');
+            ->html('<p>'.$content.'</p> : <a href="http://127.0.0.1:8000/confirmAccount/'.$token.'">Lien de confirmation</a>');
 
         $this->mailer->send($email);
     }
 
     /**
+     * @param string $dst
+     * @param string $subject
+     * @param string $content
+     * @param string $code
+     * @return void
      * @throws TransportExceptionInterface
      */
     public function sendResetPasswordMail(string $dst, string $subject, string $content, string $code): void
