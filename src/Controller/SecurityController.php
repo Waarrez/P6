@@ -27,10 +27,6 @@ class SecurityController extends AbstractController
     )
     {}
 
-    /**
-     * @param AuthenticationUtils $authenticationUtils
-     * @return Response
-     */
     #[Route(path: '/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
@@ -46,9 +42,6 @@ class SecurityController extends AbstractController
         return $this->render('security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);
     }
 
-    /**
-     * @return void
-     */
     #[Route(path: '/logout', name: 'app_logout')]
     public function logout(): void
     {
@@ -90,7 +83,7 @@ class SecurityController extends AbstractController
                 $entityManager->flush();
 
                 $this->addFlash('success', 'Votre inscription a bien été enregistrée. Un email de confirmation va être envoyé.');
-            } catch (Exception $e) {
+            } catch (Exception) {
                 $this->addFlash('error', "Le nom d'utilisateur ".$user->getUsername()." est déja utilisé !");
             }
         }
@@ -100,10 +93,6 @@ class SecurityController extends AbstractController
         ]);
     }
 
-    /**
-     * @param string $token
-     * @return Response|null
-     */
     #[Route(path: '/confirmAccount/{token}', name: 'app_confirm_account')]
     public function confirmAccount(string $token): ?Response
     {
@@ -142,7 +131,7 @@ class SecurityController extends AbstractController
 
         $session->set('code', '');
 
-        if ($request->isMethod('POST') === true) {
+        if ($request->isMethod('POST')) {
             $user = $this->userRepository->findOneBy(['email' => $email]);
             $session->set('email', $email);
 
@@ -175,11 +164,6 @@ class SecurityController extends AbstractController
         ]);
     }
 
-    /**
-     * @param SessionInterface $session
-     * @param Request $request
-     * @return Response
-     */
     #[Route("/confirmCode", name: "home.confirmCode")]
     public function confirmCode(SessionInterface $session, Request $request) : Response {
 
@@ -204,16 +188,11 @@ class SecurityController extends AbstractController
         return $this->render('account/confirmResetPassword.html.twig');
     }
 
-    /**
-     * @param Request $request
-     * @param SessionInterface $session
-     * @return Response
-     */
     #[Route("/newPassword", name: "home.newPassword")]
     public function addNewPassword(Request $request, SessionInterface $session) : Response {
 
         if ($session->get('code') === true) {
-            if ($request->isMethod("POST") === true) {
+            if ($request->isMethod("POST")) {
                 $password = $request->request->get('password');
 
                 $email = $session->get('email');

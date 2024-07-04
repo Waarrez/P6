@@ -8,28 +8,14 @@ use Symfony\Component\Mime\Email;
 
 class MailerService
 {
-    /**
-     * @var MailerInterface
-     */
-    private MailerInterface $mailer;
-
-    /**
-     * @param MailerInterface $mailer
-     */
-    public function __construct(MailerInterface $mailer)
+    public function __construct(private MailerInterface $mailer)
     {
-        $this->mailer = $mailer;
     }
 
 
     /**
      * Function for sending mail
      *
-     * @param string $to
-     * @param string $subject
-     * @param string $content
-     * @param string $token
-     * @return void
      * @throws TransportExceptionInterface
      */
     public function sendEmail(string $to, string $subject, string $content, string $token): void
@@ -45,11 +31,6 @@ class MailerService
     }
 
     /**
-     * @param string $dst
-     * @param string $subject
-     * @param string $content
-     * @param string $code
-     * @return void
      * @throws TransportExceptionInterface
      */
     public function sendResetPasswordMail(string $dst, string $subject, string $content, string $code): void

@@ -24,30 +24,18 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordC
 class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
     /**
-     * @var UserPasswordHasherInterface
-     */
-    private UserPasswordHasherInterface $passwordHasher;
-
-    /**
      * Constructor.
-     *
-     * @param ManagerRegistry $registry
-     * @param UserPasswordHasherInterface $passwordHasher
      */
-    public function __construct(ManagerRegistry $registry, UserPasswordHasherInterface $passwordHasher)
+    public function __construct(ManagerRegistry $registry, private UserPasswordHasherInterface $passwordHasher)
     {
         parent::__construct($registry, User::class);
-        $this->passwordHasher = $passwordHasher;
     }
 
 
     /**
      * Used to upgrade (rehash) the user's password automatically over time.
      *
-     * @param PasswordAuthenticatedUserInterface $user
      *
-     * @param string $newHashedPassword
-     * @return void
      */
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
     {
@@ -63,10 +51,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
     /**
      * Checks user credentials.
-     *
-     * @param UserInterface $user
-     * @param PasswordCredentials $credentials
-     * @return bool
      */
     public function checkCredentials(UserInterface $user, PasswordCredentials $credentials): bool
     {

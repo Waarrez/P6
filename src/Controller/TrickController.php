@@ -52,8 +52,6 @@ class TrickController extends AbstractController
     }
 
     /**
-     * @param string $slug
-     * @return Response
      * @throws NonUniqueResultException
      */
     #[Route('/trick/detail/{slug}', name: "home.viewTrick")]
@@ -76,7 +74,7 @@ class TrickController extends AbstractController
     {
         $trick = $this->trickRepository->getTrickBySlug($slug);
 
-        if ($trick === null) {
+        if (!$trick instanceof \App\Entity\Trick) {
             $this->addFlash("error", "La figure avec le slug '$slug' n'existe pas.");
             return $this->redirectToRoute('tricks');
         }
