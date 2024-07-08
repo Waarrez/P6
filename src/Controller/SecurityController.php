@@ -6,9 +6,12 @@ use App\Services\MailerService;
 use App\Entity\User;
 use App\Form\RegisterFormType;
 use App\Repository\UserRepository;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -59,9 +62,7 @@ class SecurityController extends AbstractController
         }
 
         $user = new User();
-
         $registerForm = $this->createForm(RegisterFormType::class, $user);
-
         $registerForm->handleRequest($request);
 
         if ($registerForm->isSubmitted() && $registerForm->isValid()) {
@@ -83,9 +84,21 @@ class SecurityController extends AbstractController
                 $entityManager->flush();
 
                 $this->addFlash('success', 'Votre inscription a bien été enregistrée. Un email de confirmation va être envoyé.');
-            } catch (Exception) {
-                $this->addFlash('error', "Le nom d'utilisateur ".$user->getUsername()." est déja utilisé !");
+                return $this->redirectToRoute('home.index'); // Redirection après succès
+            } catch (UniqueConstraintViolationException $e) {
+                if (str_contains($e->getMessage(), 'email')) {
+                    $this->addFlash('error', 'Cet email est déjà utilisé.');
+                } elseif (str_contains($e->getMessage(), 'username')) {
+                    $this->addFlash('error', 'Ce nom d\'utilisateur est déjà pris.');
+                } else {
+                    $this->addFlash('error', 'Une erreur est survenue. Veuillez réessayer.');
+                }
+            } catch (Exception $e) {
+                dump($e->getMessage());
+                $this->addFlash('error', "Une erreur est survenue lors de votre inscription. Veuillez réessayer.");
             }
+        } else {
+            $this->addFormErrorsToFlash($registerForm);
         }
 
         return $this->render('account/register.html.twig', [
@@ -215,5 +228,13 @@ class SecurityController extends AbstractController
         }
 
         return $this->render('account/addNewPassword.html.twig');
+    }
+
+    private function addFormErrorsToFlash(FormInterface $form): void
+    {
+        foreach ($form->getErrors(true) as $error) {
+            /** @var FormError $error */
+            $this->addFlash('error', $error->getMessage());
+        }
     }
 }
