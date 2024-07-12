@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Comment;
 use App\Entity\Trick;
+use App\Entity\User;
 use App\Form\Trick\TrickHandler;
 use App\Repository\TrickRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -132,24 +133,36 @@ class TrickController extends AbstractController
      */
     public function addComment(Request $request): JsonResponse
     {
+        /** @var $user User */
         $user = $this->getUser();
         $content = $request->request->get('content');
         $slug = $request->request->get('slug');
         $trick = $this->trickRepository->getTrickBySlug($slug);
 
+        if (!$trick) {
+            return new JsonResponse([
+                'message' => 'Trick non trouvé',
+            ], 404);
+        }
+
         $comment = new Comment();
         $comment->setContent($content);
         $comment->setTrick($trick);
-        $comment->setUsername($user->getUsername());
+        $comment->setUsers($user);
 
         $this->entityManager->persist($comment);
         $this->entityManager->flush();
 
         $updatedComments = [];
         foreach ($trick->getComments() as $comment) {
+            $user = $comment->getUsers();
+            $userPicture = $user->getUserPicture();
+            $imgPath = $userPicture && $userPicture !== "" ? 'uploads/pictures/' . $userPicture : 'img/default-picture.png';
+
             $updatedComments[] = [
-                'username' => $comment->getUsername(),
+                'username' => $user->getUsername(),
                 'content' => $comment->getContent(),
+                'userPicture' => $imgPath,
             ];
         }
 
@@ -158,4 +171,5 @@ class TrickController extends AbstractController
             'comments' => $updatedComments,
         ]);
     }
+
 }

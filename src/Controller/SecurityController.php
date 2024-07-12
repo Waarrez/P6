@@ -12,6 +12,7 @@ use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -67,6 +68,18 @@ class SecurityController extends AbstractController
 
         if ($registerForm->isSubmitted() && $registerForm->isValid()) {
             try {
+                $image = $registerForm->get('user_picture')->getData();
+
+                if($image !== null) {
+                    $newFileName = uniqid().'.'.$image->guessExtension();
+
+                    $image->move($this->getParameter("upload_pictures"), $newFileName);
+
+                    $user->setUserPicture($newFileName);
+                } else {
+                   $user->setUserPicture("");
+                }
+
                 $token = bin2hex(random_bytes(16));
                 $user->setConfirmAccount($token);
 
