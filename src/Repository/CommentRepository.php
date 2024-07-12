@@ -20,14 +20,4 @@ class CommentRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Comment::class);
     }
-
-    public function findNextComments($offset, $limit)
-    {
-        return $this->createQueryBuilder('c')
-            ->orderBy('c.createdAt', 'DESC')
-            ->setFirstResult($offset)
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
-    }
 }
