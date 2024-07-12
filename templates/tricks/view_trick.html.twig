@@ -1,20 +1,20 @@
 {% extends 'base.html.twig' %}
 
-{% block title trick.name  %}
+{% block title trick.name %}
 
 {% block body %}
 
     <div class="text-center">
         <p style="position:absolute;font-size: 150px; color: black; font-weight: bold; top: 50%; left: 50%; transform: translate(-50%, -50%);">{{ trick.name }}</p>
-        <img width="100%" src="{{ asset('uploads/tricksImg/' ~ trick.images) }}" alt="">
+        <img width="100%" src="{{ asset('uploads/tricksImg/' ~ trick.images) }}" alt="Trick Image" onerror="this.src='{{ asset('img/default-picture.png') }}'">
     </div>
 
     {% if trick.medias %}
         <div class="mt-5 d-flex align-items-center justify-content-around">
             <iframe width="560" height="315" src="{{ trick.medias }}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
             {% if trick.imagesTrick %}
-                {% for imagesTrick in trick.imagesTrick  %}
-                    <img width="20%" src="{{ asset('uploads/tricksImg/' ~ imagesTrick.name ) }}" alt="">
+                {% for imagesTrick in trick.imagesTrick %}
+                    <img width="20%" src="{{ asset('uploads/tricksImg/' ~ imagesTrick.name) }}" alt="Trick Additional Image" onerror="this.src='{{ asset('img/default-picture.png') }}'">
                 {% endfor %}
             {% endif %}
         </div>
@@ -54,11 +54,13 @@
         <hr class="mt-5" style="width: 50%; ">
     </div>
 
-    <div style="width: 50%" class="container mt-5 mb-5 " id="commentaires">
+    <div style="width: 50%" class="container mt-5 mb-5" id="commentaires">
         {% for comment in comments %}
-            <div id="fourComments" class="comments" style="background-color: #f7f7f9">
-                <span class="badge bg-primary" style="margin-left: 20px">{{ comment.username }}</span>
-                <p style="margin-left: 100px; margin-bottom: 0" class="">{{ comment.content }}</p>
+            <div class="d-flex align-items-center gap-5 mt-5 w-100" style="background-color: #f7f7f9">
+                <img class="rounded-circle" width="5%" src="{{ comment.users.userPicture ? asset('uploads/pictures/' ~ comment.users.userPicture) : asset('img/default-picture.png') }}" alt="User Avatar" onerror="this.src='{{ asset('img/default-picture.png') }}'">
+                <span class="badge bg-dark">{{ comment.users.username }}</span>
+                <p style="margin-left: 100px; margin-bottom: 0">{{ comment.content }}</p>
+                <span class="badge bg-dark ms-auto">Posté le {{ comment.createdAt|date('Y-m-d') }}</span>
             </div>
         {% endfor %}
     </div>
@@ -71,14 +73,13 @@
 
     <script type="module">
         let url = window.location.href;
-
         let slugMatches = url.match(/\/trick\/detail\/([^\/]+)$/);
         let slug = slugMatches && slugMatches[1];
 
         document.getElementById('commentForm').addEventListener('submit', function(event) {
             event.preventDefault();
 
-            const content = document.getElementById('content').value.trim(); // trim() enlève les espaces en début et fin
+            const content = document.getElementById('content').value.trim();
 
             if (content === '') {
                 alert('Veuillez entrer un commentaire.');
@@ -90,20 +91,26 @@
             xhttp.onreadystatechange = function() {
                 if (this.readyState === 4 && this.status === 200) {
                     let response = JSON.parse(this.responseText);
-                    let message = response.message;
                     let newComments = response.comments;
 
                     let commentairesDiv = document.getElementById('commentaires');
-                    commentairesDiv.innerHTML = '';
                     commentairesDiv.innerHTML = '<div class="alert alert-success">Votre commentaire a bien été ajouté !</div>';
 
                     newComments.forEach(function(comment) {
                         let newCommentDiv = document.createElement('div');
-                        newCommentDiv.classList.add('d-flex', 'align-items-center', 'p-3', 'mt-5');
+                        newCommentDiv.classList.add('d-flex', 'align-items-center', 'gap-5', 'mt-5');
                         newCommentDiv.style.backgroundColor = '#f7f7f9';
+
+                        let imgSrc = comment.userPicture && comment.userPicture !== ""
+                            ? '/uploads/pictures/' + comment.userPicture
+                            : '/img/default-picture.png';
+
                         newCommentDiv.innerHTML = `
-                    <span class="badge bg-primary" style="margin-left: 20px">${comment.username}</span>
-                    <p style="margin-left: 100px; margin-bottom: 0">${comment.content}</p>`;
+                            <img class="rounded-circle" width="5%" src="${imgSrc}" alt="Avatar" onerror="this.src='/img/default-picture.png'">
+                            <span class="badge bg-dark">${comment.username}</span>
+                            <p style="margin-left: 100px; margin-bottom: 0">${comment.content}</p>
+                        `;
+
                         commentairesDiv.appendChild(newCommentDiv);
                     });
                 }
@@ -117,8 +124,6 @@
         let comments = document.getElementsByClassName("comments");
         let buttonShow = document.getElementById("loadComment");
 
-        console.log(comments);
-
         buttonShow.addEventListener('click', () => {
             for (let i = 0; i < comments.length; i++) {
                 comments[i].removeAttribute("id");
@@ -126,5 +131,4 @@
             buttonShow.classList.add("noneButton");
         });
     </script>
-
 {% endblock %}

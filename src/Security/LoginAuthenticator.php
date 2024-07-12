@@ -35,7 +35,7 @@ class LoginAuthenticator extends AbstractLoginFormAuthenticator
 
         $user = $this->userRepository->findOneBy(['username' => $username]);
 
-        if ($user === false) {
+        if ($user === null) {
             throw new CustomUserMessageAuthenticationException('Nom d\'utilisateur incorrect.');
         }
 

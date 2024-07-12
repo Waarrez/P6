@@ -21,12 +21,17 @@ class Comment
     #[ORM\ManyToOne(inversedBy: 'comments')]
     private ?Trick $trick = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $username = null;
+    #[ORM\ManyToOne(inversedBy: 'comments')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $users = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
 
     public function __construct()
     {
         $this->id = Ulid::generate();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?string
@@ -58,14 +63,26 @@ class Comment
         return $this;
     }
 
-    public function getUsername(): ?string
+    public function getUsers(): ?User
     {
-        return $this->username;
+        return $this->users;
     }
 
-    public function setUsername(string $username): static
+    public function setUsers(?User $users): static
     {
-        $this->username = $username;
+        $this->users = $users;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
 
         return $this;
     }
