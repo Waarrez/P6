@@ -54,6 +54,7 @@ class Trick
     private ?\DateTimeImmutable $editAt = null;
 
     #[ORM\OneToMany(mappedBy: 'trick', targetEntity: Comment::class)]
+    #[ORM\OrderBy(['createdAt' => 'DESC'])]
     #[Groups("tricks")]
     private Collection $comments;
 

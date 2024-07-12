@@ -6,6 +6,7 @@ use App\Entity\Comment;
 use App\Entity\Trick;
 use App\Entity\User;
 use App\Form\Trick\TrickHandler;
+use App\Repository\CommentRepository;
 use App\Repository\TrickRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
@@ -171,5 +172,4 @@ class TrickController extends AbstractController
             'comments' => $updatedComments,
         ]);
     }
-
 }

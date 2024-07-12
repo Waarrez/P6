@@ -107,7 +107,6 @@ class SecurityController extends AbstractController
                     $this->addFlash('error', 'Une erreur est survenue. Veuillez réessayer.');
                 }
             } catch (Exception $e) {
-                dump($e->getMessage());
                 $this->addFlash('error', "Une erreur est survenue lors de votre inscription. Veuillez réessayer.");
             }
         } else {

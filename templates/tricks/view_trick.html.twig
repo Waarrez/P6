@@ -1,12 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title trick.name %}
+{% block title %}{{ trick.name }}{% endblock %}
 
 {% block body %}
 
     <div class="text-center">
         <p style="position:absolute;font-size: 150px; color: black; font-weight: bold; top: 50%; left: 50%; transform: translate(-50%, -50%);">{{ trick.name }}</p>
         <img width="100%" src="{{ asset('uploads/tricksImg/' ~ trick.images) }}" alt="Trick Image" onerror="this.src='{{ asset('img/default-picture.png') }}'">
+    </div>
+
+    <div class="container text-center mt-5 mb-5 fs-3">
+        {{ trick.content }}
     </div>
 
     {% if trick.medias %}
@@ -36,7 +40,7 @@
                 </div>
             {% endfor %}
 
-            <h2 class="text-center mt-5 mb-5">Ecrire un commentaire</h2>
+            <h2 class="text-center mt-5 mb-5">Écrire un commentaire</h2>
             {% if app.user %}
                 <form class="d-flex align-items-center p-3 mt-5" id="commentForm">
                     <input id="content" type="text" class="form-control">
@@ -56,7 +60,7 @@
 
     <div style="width: 50%" class="container mt-5 mb-5" id="commentaires">
         {% for comment in comments %}
-            <div class="d-flex align-items-center gap-5 mt-5 w-100" style="background-color: #f7f7f9">
+            <div class="d-flex align-items-center gap-5 mt-5 w-100 comment {% if loop.index > 4 %}hidden-comment{% endif %}">
                 <img class="rounded-circle" width="5%" src="{{ comment.users.userPicture ? asset('uploads/pictures/' ~ comment.users.userPicture) : asset('img/default-picture.png') }}" alt="User Avatar" onerror="this.src='{{ asset('img/default-picture.png') }}'">
                 <span class="badge bg-dark">{{ comment.users.username }}</span>
                 <p style="margin-left: 100px; margin-bottom: 0">{{ comment.content }}</p>
@@ -65,70 +69,19 @@
         {% endfor %}
     </div>
 
-    {% if comments|length > 3 %}
-        <div class="d-flex justify-content-center align-items-center">
-            <button id="loadComment" class="btn btn-outline-primary mt-5 mb-5">Charger plus</button>
+    {% if comments|length > 4 %}
+        <div class="d-flex justify-content-center align-items-center" id="loadMoreContainer">
+            <button id="loadMoreComments" class="btn btn-outline-primary mt-5 mb-5" data-offset="4">Afficher plus</button>
         </div>
     {% endif %}
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="module">
-        let url = window.location.href;
-        let slugMatches = url.match(/\/trick\/detail\/([^\/]+)$/);
-        let slug = slugMatches && slugMatches[1];
-
-        document.getElementById('commentForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const content = document.getElementById('content').value.trim();
-
-            if (content === '') {
-                alert('Veuillez entrer un commentaire.');
-                return;
-            }
-
-            let xhttp = new XMLHttpRequest();
-
-            xhttp.onreadystatechange = function() {
-                if (this.readyState === 4 && this.status === 200) {
-                    let response = JSON.parse(this.responseText);
-                    let newComments = response.comments;
-
-                    let commentairesDiv = document.getElementById('commentaires');
-                    commentairesDiv.innerHTML = '<div class="alert alert-success">Votre commentaire a bien été ajouté !</div>';
-
-                    newComments.forEach(function(comment) {
-                        let newCommentDiv = document.createElement('div');
-                        newCommentDiv.classList.add('d-flex', 'align-items-center', 'gap-5', 'mt-5');
-                        newCommentDiv.style.backgroundColor = '#f7f7f9';
-
-                        let imgSrc = comment.userPicture && comment.userPicture !== ""
-                            ? '/uploads/pictures/' + comment.userPicture
-                            : '/img/default-picture.png';
-
-                        newCommentDiv.innerHTML = `
-                            <img class="rounded-circle" width="5%" src="${imgSrc}" alt="Avatar" onerror="this.src='/img/default-picture.png'">
-                            <span class="badge bg-dark">${comment.username}</span>
-                            <p style="margin-left: 100px; margin-bottom: 0">${comment.content}</p>
-                        `;
-
-                        commentairesDiv.appendChild(newCommentDiv);
-                    });
-                }
-            };
-
-            xhttp.open('POST', '/add-comment', true);
-            xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-            xhttp.send('slug=' + slug + '&content=' + content);
-        });
-
-        let comments = document.getElementsByClassName("comments");
-        let buttonShow = document.getElementById("loadComment");
-
-        buttonShow.addEventListener('click', () => {
-            for (let i = 0; i < comments.length; i++) {
-                comments[i].removeAttribute("id");
-            }
-            buttonShow.classList.add("noneButton");
+        $(document).ready(function() {
+            $("#loadMoreComments").on("click", function() {
+                $(".comment.hidden-comment").removeClass("hidden-comment");
+                $("#loadMoreContainer").hide();
+            });
         });
     </script>
 {% endblock %}
