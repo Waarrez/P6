@@ -4,25 +4,33 @@
 
 {% block body %}
 
-    <div class="text-center">
-        <p style="position:absolute;font-size: 150px; color: black; font-weight: bold; top: 50%; left: 50%; transform: translate(-50%, -50%);">{{ trick.name }}</p>
-        <img width="100%" src="{{ asset('uploads/tricksImg/' ~ trick.images) }}" alt="Trick Image" onerror="this.src='{{ asset('img/default-picture.png') }}'">
+    <div class="text-center" style="position: relative;">
+        <p style="font-size: 100px; color: white; font-weight: bold; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">{{ trick.name }}</p>
+        <img style="width: 100%; height: auto; max-height: 70vh; object-fit: cover;" src="{{ asset('uploads/' ~ trick.images) }}" alt="Trick Image" onerror="this.src='{{ asset('img/default-picture.png') }}'">
     </div>
 
     <div class="container text-center mt-5 mb-5 fs-3">
         {{ trick.content }}
     </div>
 
-    {% if trick.medias %}
-        <div class="mt-5 d-flex align-items-center justify-content-around">
-            <iframe width="560" height="315" src="{{ trick.medias }}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-            {% if trick.imagesTrick %}
-                {% for imagesTrick in trick.imagesTrick %}
-                    <img width="20%" src="{{ asset('uploads/tricksImg/' ~ imagesTrick.name) }}" alt="Trick Additional Image" onerror="this.src='{{ asset('img/default-picture.png') }}'">
+    <div class="d-flex align-items-center justify-content-center">
+        <div class="container row mt-5 justify-content-center">
+            <div class="col-12 col-md-6 col-lg-4 mb-3 d-flex justify-content-center">
+                <div class="d-flex flex-column align-items-center">
+                    <div style="position: relative;">
+                        <iframe width="400" height="250" src="{{ trick.medias }}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+            {% if trick.secondaryImages %}
+                {% for imagesTrick in trick.secondaryImages %}
+                    <div class="col-12 col-md-6 col-lg-4 mb-3 d-flex flex-column align-items-center">
+                        <img class="trick-image" style="height: 200px;" src="{{ asset('uploads/tricksImg/tricksImg/300x200-' ~ imagesTrick.name) }}" alt="Trick Additional Image">
+                    </div>
                 {% endfor %}
             {% endif %}
         </div>
-    {% endif %}
+    </div>
 
     <div class="container mt-5 mb-5 d-flex justify-content-around align-items-center">
         <span class="badge bg-primary">{{ trick.groups.name }}</span>
