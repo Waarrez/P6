@@ -8,6 +8,7 @@ use App\Entity\Trick;
 use App\Entity\User;
 use App\Form\Trick\TrickHandler;
 use App\Repository\GroupRepository;
+use App\Repository\ImageRepository;
 use App\Repository\TrickRepository;
 use App\Services\PictureService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -26,12 +27,15 @@ class TrickController extends AbstractController
     public function __construct(
         private readonly TrickRepository        $trickRepository,
         private readonly TrickHandler           $trickHandler,
+        private readonly ImageRepository        $imageRepository,
         private readonly GroupRepository        $groupRepository,
         private readonly EntityManagerInterface $entityManager,
         private readonly Filesystem             $filesystem,
-        private readonly LoggerInterface $logger
     ) {}
 
+    /**
+     * @return Response
+     */
     #[Route('/tricks', name: 'tricks')]
     public function tricks(): Response
     {
@@ -42,6 +46,10 @@ class TrickController extends AbstractController
         ]);
     }
 
+    /**
+     * @param Request $request
+     * @return Response
+     */
     #[Route('/addTrick', name: 'addTrick')]
     public function addTrick(Request $request): Response
     {
@@ -59,6 +67,8 @@ class TrickController extends AbstractController
     }
 
     /**
+     * @param string $slug
+     * @return Response
      * @throws NonUniqueResultException
      */
     #[Route('/trick/detail/{slug}', name: "home.viewTrick")]
@@ -79,6 +89,9 @@ class TrickController extends AbstractController
     }
 
     /**
+     * @param string $slug
+     * @param Request $request
+     * @return Response
      * @throws NonUniqueResultException
      */
     #[Route('/trick/edit/{slug}', name: "editTrick")]
@@ -106,7 +119,10 @@ class TrickController extends AbstractController
         ]);
     }
 
-
+    /**
+     * @param string $id
+     * @return Response
+     */
     #[Route('/trick/remove/{id}', name: "deleteTrick")]
     public function deleteTrick(string $id): Response
     {
@@ -144,6 +160,8 @@ class TrickController extends AbstractController
     }
 
     /**
+     * @param Request $request
+     * @return JsonResponse
      * @throws NonUniqueResultException
      */
     public function addComment(Request $request): JsonResponse
@@ -186,22 +204,29 @@ class TrickController extends AbstractController
             'comments' => $updatedComments,
         ]);
     }
+
+    /**
+     * @param string $id
+     * @param Request $request
+     * @param PictureService $pictureService
+     * @return JsonResponse
+     */
     #[Route('/trick/removeImage/{id}', name: "deleteImage", methods: ['DELETE'])]
-    public function deleteImage(Image $image, Request $request, PictureService $pictureService): JsonResponse
+    public function deleteImage(string $id, Request $request, PictureService $pictureService): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
-        $this->logger->info('Received delete request', [
-            'image_id' => $image->getId(),
-            'request_data' => $data
-        ]);
-
         if (!$data || !isset($data['_token'])) {
-            $this->logger->error('No token provided in request');
             return new JsonResponse(['error' => 'Token non fourni'], 400);
         }
 
-        if ($this->isCsrfTokenValid('delete' . $image->getId(), $data['_token'])) {
+        $image = $this->imageRepository->find($id);
+
+        if (!$image) {
+            return new JsonResponse(['error' => 'Image non trouvée'], 404);
+        }
+
+        if ($this->isCsrfTokenValid('delete' . $id, $data['_token'])) {
             $name = $image->getName();
 
             try {
@@ -209,21 +234,14 @@ class TrickController extends AbstractController
                     $this->entityManager->remove($image);
                     $this->entityManager->flush();
 
-                    $this->logger->info('Image successfully deleted', ['image_id' => $image->getId()]);
                     return new JsonResponse(['success' => 'Image supprimée'], 200);
                 } else {
-                    $this->logger->error('PictureService failed to delete the image');
                     return new JsonResponse(['error' => 'Erreur de suppression'], 400);
                 }
             } catch (\Exception $e) {
-                $this->logger->error('Exception during image deletion', ['exception' => $e->getMessage()]);
                 return new JsonResponse(['error' => 'Erreur de suppression: ' . $e->getMessage()], 500);
             }
         } else {
-            $this->logger->error('Invalid CSRF token', [
-                'token' => $data['_token'],
-                'image_id' => $image->getId()
-            ]);
             return new JsonResponse(['error' => 'Token invalide'], 400);
         }
     }
