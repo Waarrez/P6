@@ -220,6 +220,10 @@ class TrickController extends AbstractController
             return new JsonResponse(['error' => 'Token non fourni'], 400);
         }
 
+        if (!is_string($id)) {
+            return new JsonResponse(['error' => 'ID invalide'], 400);
+        }
+
         $image = $this->imageRepository->find($id);
 
         if (!$image) {
