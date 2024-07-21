@@ -9,19 +9,24 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\String\AbstractUnicodeString;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 
 final class TrickHandler
 {
+    private $requestStack;
+
     public function __construct(
         private readonly FormFactoryInterface $formFactory,
         private readonly EntityManagerInterface $entityManager,
-        private readonly PictureService $pictureService
+        private readonly PictureService $pictureService,
+        RequestStack $requestStack
     )
     {
-    } // end __construct()
+        $this->requestStack = $requestStack;
+    }
 
     /**
      * @param array<string, mixed> $options
@@ -45,8 +50,14 @@ final class TrickHandler
             $slug = $this->setSlugForName($name);
             $trick->setSlug($slug);
 
+            if (count($files) >= 4) {
+                $session = $this->requestStack->getSession();
+                $session->getFlashBag()->add('error', 'Vous ne pouvez mettre que 3 images');
+                return false;
+            }
+
             foreach ($files as $imageForm) {
-                $newFileName = $this->pictureService->add($imageForm,'' , 300, 200 );
+                $newFileName = $this->pictureService->add($imageForm, '', 300, 200);
 
                 try {
                     $image = new Image();
@@ -62,11 +73,9 @@ final class TrickHandler
             }
 
             if ($file !== null) {
-                // Vérifier s'il y a déjà une image associée au trick
                 $existingImage = $trick->getImages();
 
                 if ($existingImage !== null) {
-                    // Supprimer l'ancienne image du répertoire
                     $existingImagePath = $upload_directory . '/' . $existingImage;
                     if (file_exists($existingImagePath)) {
                         unlink($existingImagePath);

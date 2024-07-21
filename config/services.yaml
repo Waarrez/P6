@@ -20,6 +20,13 @@ services:
         tags:
             - { name: 'controller.service_arguments' }
 
+    App\Form\Trick\TrickHandler:
+        arguments:
+            $formFactory: '@form.factory'
+            $entityManager: '@doctrine.orm.entity_manager'
+            $pictureService: '@App\Services\PictureService'
+            $requestStack: '@request_stack'
+
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:

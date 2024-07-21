@@ -12,7 +12,7 @@ class ErrorController extends AbstractController
     /**
      * @return Response
      */
-    #[Route('/error404', name: 'error404')]
+    #[Route('/error404', name: 'error404', methods: ['GET'])]
     public function error404(): Response
     {
         return $this->render('error/error404.html.twig');
