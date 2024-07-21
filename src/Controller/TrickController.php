@@ -230,7 +230,9 @@ class TrickController extends AbstractController
             return new JsonResponse(['error' => 'Image non trouvée'], 404);
         }
 
-        if ($this->isCsrfTokenValid('delete' . $image->getId(), $data['_token'])) {
+        // Vérifiez le token CSRF en utilisant l'ID validé
+        $csrfToken = 'delete' . $id;
+        if ($this->isCsrfTokenValid($csrfToken, $data['_token'])) {
             $name = $image->getName();
 
             try {
