@@ -3,13 +3,17 @@
 namespace App\Controller;
 
 use App\Entity\Comment;
+use App\Entity\Image;
 use App\Entity\Trick;
 use App\Entity\User;
 use App\Form\Trick\TrickHandler;
-use App\Repository\CommentRepository;
+use App\Repository\GroupRepository;
+use App\Repository\ImageRepository;
 use App\Repository\TrickRepository;
+use App\Services\PictureService;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
@@ -17,16 +21,25 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class TrickController extends AbstractController
 {
     public function __construct(
-        private readonly TrickRepository $trickRepository,
-        private readonly TrickHandler $trickHandler,
+        private readonly TrickRepository        $trickRepository,
+        private readonly TrickHandler           $trickHandler,
+        private readonly ImageRepository        $imageRepository,
+        private readonly GroupRepository        $groupRepository,
         private readonly EntityManagerInterface $entityManager,
-        private readonly Filesystem $filesystem
+        private readonly Filesystem             $filesystem,
+        private readonly PictureService $pictureService,
+        private CsrfTokenManagerInterface $csrfTokenManager
     ) {}
 
+    /**
+     * @return Response
+     */
     #[Route('/tricks', name: 'tricks')]
     public function tricks(): Response
     {
@@ -37,6 +50,10 @@ class TrickController extends AbstractController
         ]);
     }
 
+    /**
+     * @param Request $request
+     * @return Response
+     */
     #[Route('/addTrick', name: 'addTrick')]
     public function addTrick(Request $request): Response
     {
@@ -54,13 +71,20 @@ class TrickController extends AbstractController
     }
 
     /**
+     * @param string $slug
+     * @return Response
      * @throws NonUniqueResultException
      */
     #[Route('/trick/detail/{slug}', name: "home.viewTrick")]
     public function viewTrick(string $slug): Response
     {
         $trick = $this->trickRepository->getTrickBySlug($slug);
-        $comments = $trick->getComments();
+
+        if($trick->getComments() && $trick) {
+            $comments = $trick->getComments();
+        } else {
+            $comments = [];
+        }
 
         return $this->render('tricks/view_trick.html.twig', [
             'trick' => $trick,
@@ -69,30 +93,40 @@ class TrickController extends AbstractController
     }
 
     /**
+     * @param string $slug
+     * @param Request $request
+     * @return Response
      * @throws NonUniqueResultException
      */
     #[Route('/trick/edit/{slug}', name: "editTrick")]
     public function editTrick(string $slug, Request $request): Response
     {
         $trick = $this->trickRepository->getTrickBySlug($slug);
+        $groups = $this->groupRepository->findAll();
 
-        if ($trick instanceof Trick === false) {
+        if (!$trick instanceof Trick) {
             $this->addFlash("error", "La figure avec le slug '$slug' n'existe pas.");
             return $this->redirectToRoute('tricks');
         }
 
         $form = $this->trickHandler->prepare($trick);
 
-        if ($this->trickHandler->handle($form, $request, $trick, $this->getParameter("upload_directory"), true)) {
-            $this->addFlash("success", "La figure a bien été modifiée !");
-            return $this->redirectToRoute('home.index');
+        if ($this->trickHandler->handle($form, $request, $trick, $this->getParameter("upload_directory"))) {
+            $this->addFlash("success", "La figure à bien été modifié !");
+            return $this->redirectToRoute('tricks');
         }
 
         return $this->render('tricks/edit_trick.html.twig', [
+            'trick' => $trick,
             'form' => $form->createView(),
+            'groups' => $groups
         ]);
     }
 
+    /**
+     * @param string $id
+     * @return Response
+     */
     #[Route('/trick/remove/{id}', name: "deleteTrick")]
     public function deleteTrick(string $id): Response
     {
@@ -130,6 +164,8 @@ class TrickController extends AbstractController
     }
 
     /**
+     * @param Request $request
+     * @return JsonResponse
      * @throws NonUniqueResultException
      */
     public function addComment(Request $request): JsonResponse
@@ -171,5 +207,52 @@ class TrickController extends AbstractController
             'message' => 'Commentaire ajouté avec succès',
             'comments' => $updatedComments,
         ]);
+    }
+
+    /**
+     * @param string $id
+     * @param Request $request
+     * @param PictureService $pictureService
+     * @return JsonResponse
+     */
+    #[Route('/trick/removeImage/{id}', name: "deleteImage", methods: ['DELETE'])]
+    public function deleteImage(string $id, Request $request, PictureService $pictureService): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if (!$data || !isset($data['_token'])) {
+            return new JsonResponse(['error' => 'Token non fourni'], 400);
+        }
+
+        // Validation de l'ID
+        if (!preg_match('/^[a-zA-Z0-9\-]+$/', $id)) {
+            return new JsonResponse(['error' => 'ID invalide'], 400);
+        }
+
+        $image = $this->imageRepository->find($id);
+
+        if (!$image) {
+            return new JsonResponse(['error' => 'Image non trouvée'], 404);
+        }
+
+        $csrfToken = new CsrfToken('delete' . $id, $data['_token']);
+        if (!$this->csrfTokenManager->isTokenValid($csrfToken)) {
+            return new JsonResponse(['error' => 'Token invalide'], 400);
+        }
+
+        $name = $image->getName();
+
+        try {
+            if ($this->pictureService->delete($name, 'tricksImg', 300, 200)) {
+                $this->entityManager->remove($image);
+                $this->entityManager->flush();
+
+                return new JsonResponse(['success' => 'Image supprimée'], 200);
+            } else {
+                return new JsonResponse(['error' => 'Erreur de suppression'], 400);
+            }
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => 'Erreur de suppression: ' . $e->getMessage()], 500);
+        }
     }
 }

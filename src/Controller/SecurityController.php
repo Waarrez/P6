@@ -31,6 +31,10 @@ class SecurityController extends AbstractController
     )
     {}
 
+    /**
+     * @param AuthenticationUtils $authenticationUtils
+     * @return Response
+     */
     #[Route(path: '/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
@@ -53,7 +57,10 @@ class SecurityController extends AbstractController
     }
 
     /**
-     * @throws Exception|TransportExceptionInterface
+     * @param Request $request
+     * @param EntityManagerInterface $entityManager
+     * @return Response
+     * @throws TransportExceptionInterface
      */
     #[Route('/register', name: 'home.register')]
     public function register(Request $request, EntityManagerInterface $entityManager): Response
@@ -118,6 +125,10 @@ class SecurityController extends AbstractController
         ]);
     }
 
+    /**
+     * @param string $token
+     * @return Response|null
+     */
     #[Route(path: '/confirmAccount/{token}', name: 'app_confirm_account')]
     public function confirmAccount(string $token): ?Response
     {

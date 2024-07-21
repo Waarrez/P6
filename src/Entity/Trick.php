@@ -58,17 +58,20 @@ class Trick
     #[Groups("tricks")]
     private Collection $comments;
 
-    #[ORM\OneToMany(mappedBy: 'tricks', targetEntity: Images::class, orphanRemoval: true)]
-    private Collection $imagesTrick;
-
     #[ORM\Column(length: 255)]
     private ?string $slug = null;
+
+    /**
+     * @var Collection<int, Image>
+     */
+    #[ORM\OneToMany(mappedBy: 'tricks', targetEntity: Image::class, orphanRemoval: true)]
+    private Collection $secondaryImages;
 
     public function __construct()
     {
         $this->id = Ulid::generate();
         $this->comments = new ArrayCollection();
-        $this->imagesTrick = new ArrayCollection();
+        $this->secondaryImages = new ArrayCollection();
     }
 
     public function getId(): ?string
@@ -198,34 +201,6 @@ class Trick
         return $this;
     }
 
-    /**
-     * @return Collection<int, Images>
-     */
-    public function getImagesTrick(): Collection
-    {
-        return $this->imagesTrick;
-    }
-
-    public function addImagesTrick(Images $imagesTrick): static
-    {
-        if (!$this->imagesTrick->contains($imagesTrick)) {
-            $this->imagesTrick->add($imagesTrick);
-            $imagesTrick->setTricks($this);
-        }
-
-        return $this;
-    }
-
-    public function removeImagesTrick(Images $imagesTrick): static
-    {
-        // set the owning side to null (unless already changed)
-        if ($this->imagesTrick->removeElement($imagesTrick) === true && $imagesTrick->getTricks() === $this) {
-            $imagesTrick->setTricks(null);
-        }
-
-        return $this;
-    }
-
     public function getSlug(): ?string
     {
         return $this->slug;
@@ -234,6 +209,36 @@ class Trick
     public function setSlug(string $slug): static
     {
         $this->slug = $slug;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Image>
+     */
+    public function getSecondaryImages(): Collection
+    {
+        return $this->secondaryImages;
+    }
+
+    public function addSecondaryImage(Image $secondaryImage): self
+    {
+        if (!$this->secondaryImages->contains($secondaryImage)) {
+            $this->secondaryImages->add($secondaryImage);
+            $secondaryImage->setTricks($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSecondaryImage(Image $secondaryImage): self
+    {
+        if ($this->secondaryImages->removeElement($secondaryImage)) {
+            // set the owning side to null (unless already changed)
+            if ($secondaryImage->getTricks() === $this) {
+                $secondaryImage->setTricks(null);
+            }
+        }
 
         return $this;
     }

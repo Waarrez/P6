@@ -22,6 +22,9 @@ class HomeController extends AbstractController
     )
     {}
 
+    /**
+     * @return Response
+     */
     #[Route('/', name: 'home.index')]
     public function index(): Response
     {

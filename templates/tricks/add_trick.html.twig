@@ -3,7 +3,6 @@
 {% block title "Ajouter une nouvelle figure" %}
 
 {% block body %}
-
     <div class="container text-center mt-5 mb-5 col-md-4">
         <h2>Ajouter une nouvelle figure</h2>
 
@@ -13,15 +12,14 @@
         <label class="mt-2" for="">Description : </label>
         {{ form_row(form.content, {'attr' : {'class' : 'form-control mt-3'}}) }}
         <label class="mt-2" for="">Catégorie : </label>
-        {{ form_row(form.groups, {'attr' : {'class' : 'form-control mt-3'}}) }}
+        {{ form_row(form.groups, {'attr' : {'class' : 'form-select mt-3'}}) }}
         <label class="mt-2" for="">Image principal : </label>
         {{ form_row(form.imageFile, {'attr' : {'class' : 'form-control mt-3'}}) }}
-        <label class="mt-2" for="">Autres images : </label>
+        <label class="mt-2" for="">Images secondaires : </label>
         {{ form_row(form.images, {'attr' : {'class' : 'form-control mt-3'}}) }}
         <label class="mt-2" for="">Vidéos : </label>
         {{ form_row(form.medias, {'attr' : {'class' : 'form-control mt-3'}}) }}
         <button class="btn btn-primary mt-5" type="submit">Ajouter</button>
         {{ form_end(form) }}
     </div>
-
 {% endblock %}
