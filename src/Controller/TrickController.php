@@ -214,10 +214,8 @@ class TrickController extends AbstractController
     #[Route('/trick/removeImage/{id}', name: "deleteImage", methods: ['DELETE'])]
     public function deleteImage(string $id, Request $request, PictureService $pictureService): JsonResponse
     {
-        // Décodage du contenu de la requête
         $data = json_decode($request->getContent(), true);
 
-        // Vérification de la présence du token CSRF
         if (!$data || !isset($data['_token'])) {
             return new JsonResponse(['error' => 'Token non fourni'], 400);
         }
@@ -232,7 +230,7 @@ class TrickController extends AbstractController
             return new JsonResponse(['error' => 'Image non trouvée'], 404);
         }
 
-        if ($this->isCsrfTokenValid('delete' . $id, $data['_token'])) {
+        if ($this->isCsrfTokenValid('delete' . $image->getId(), $data['_token'])) {
             $name = $image->getName();
 
             try {
