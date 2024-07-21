@@ -90,20 +90,22 @@
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
 
-                    if (confirm("Etes vous sur de vouloir supprimer l'image ?")) {
+                    if (confirm("Êtes-vous sûr de vouloir supprimer l'image ?")) {
                         console.log('Sending request to:', link.getAttribute("href"));
                         console.log('Token:', link.dataset.token);
 
                         fetch(link.getAttribute("href"), {
                             method: "DELETE",
                             headers: {
-                                "X-Request-With": "XMLHttpRequest",
+                                "X-Requested-With": "XMLHttpRequest",
                                 "Content-Type": "application/json"
                             },
                             body: JSON.stringify({"_token": link.dataset.token})
                         })
                             .then(response => {
-                                console.log('Response status:', response.status);
+                                if (!response.ok) {
+                                    throw new Error('Network response was not ok');
+                                }
                                 return response.json();
                             })
                             .then(data => {
@@ -115,7 +117,10 @@
                                     alert(data.error);
                                 }
                             })
-                            .catch(error => console.error('Error:', error));
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert('Une erreur est survenue, veuillez réessayer.');
+                            });
                     }
                 });
             }

@@ -21,6 +21,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class TrickController extends AbstractController
 {
@@ -31,6 +33,8 @@ class TrickController extends AbstractController
         private readonly GroupRepository        $groupRepository,
         private readonly EntityManagerInterface $entityManager,
         private readonly Filesystem             $filesystem,
+        private readonly PictureService $pictureService,
+        private CsrfTokenManagerInterface $csrfTokenManager
     ) {}
 
     /**
@@ -220,6 +224,7 @@ class TrickController extends AbstractController
             return new JsonResponse(['error' => 'Token non fourni'], 400);
         }
 
+        // Validation de l'ID
         if (!preg_match('/^[a-zA-Z0-9\-]+$/', $id)) {
             return new JsonResponse(['error' => 'ID invalide'], 400);
         }
@@ -230,25 +235,24 @@ class TrickController extends AbstractController
             return new JsonResponse(['error' => 'Image non trouvée'], 404);
         }
 
-        // Vérifiez le token CSRF en utilisant l'ID validé
-        $csrfToken = 'delete' . $id;
-        if ($this->isCsrfTokenValid($csrfToken, $data['_token'])) {
-            $name = $image->getName();
-
-            try {
-                if ($pictureService->delete($name, 'tricksImg', 300, 200)) {
-                    $this->entityManager->remove($image);
-                    $this->entityManager->flush();
-
-                    return new JsonResponse(['success' => 'Image supprimée'], 200);
-                } else {
-                    return new JsonResponse(['error' => 'Erreur de suppression'], 400);
-                }
-            } catch (\Exception $e) {
-                return new JsonResponse(['error' => 'Erreur de suppression: ' . $e->getMessage()], 500);
-            }
-        } else {
+        $csrfToken = new CsrfToken('delete' . $id, $data['_token']);
+        if (!$this->csrfTokenManager->isTokenValid($csrfToken)) {
             return new JsonResponse(['error' => 'Token invalide'], 400);
+        }
+
+        $name = $image->getName();
+
+        try {
+            if ($this->pictureService->delete($name, 'tricksImg', 300, 200)) {
+                $this->entityManager->remove($image);
+                $this->entityManager->flush();
+
+                return new JsonResponse(['success' => 'Image supprimée'], 200);
+            } else {
+                return new JsonResponse(['error' => 'Erreur de suppression'], 400);
+            }
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => 'Erreur de suppression: ' . $e->getMessage()], 500);
         }
     }
 }
