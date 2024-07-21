@@ -4,42 +4,55 @@
 
 {% block body %}
 
-    <div class="text-center" style="position: relative;">
-        <p style="font-size: 100px; color: white; font-weight: bold; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">{{ trick.name }}</p>
-        <img style="width: 100%; height: auto; max-height: 70vh; object-fit: cover;" src="{{ asset('uploads/' ~ trick.images) }}" alt="Trick Image" onerror="this.src='{{ asset('img/default-picture.png') }}'">
+    <!-- Header avec image de fond -->
+    <div class="text-center position-relative">
+        <h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold">{{ trick.name }}</h1>
+        <img class="w-100" style="max-height: 70vh; object-fit: cover;" src="{{ asset('uploads/' ~ trick.images) }}" alt="Trick Image" onerror="this.src='{{ asset('img/default-picture.png') }}'">
     </div>
 
+    <!-- Contenu principal -->
     <div class="container text-center mt-5 mb-5 fs-3">
         {{ trick.content }}
     </div>
 
-    <div class="d-flex align-items-center justify-content-center">
-        <div class="container row mt-5 justify-content-center">
-            <div class="col-12 col-md-6 col-lg-4 mb-3 d-flex justify-content-center">
-                <div class="d-flex flex-column align-items-center">
-                    <div style="position: relative;">
-                        <iframe width="400" height="250" src="{{ trick.medias }}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    <div class="container-fluid mt-5">
+        <div id="mediaContainer" class="d-none d-md-flex">
+            <div class="d-flex flex-column flex-md-row mx-auto">
+                <!-- Conteneur pour les vidéos -->
+                <div class="d-flex flex-wrap flex-column flex-md-row me-md-3 justify-content-center align-items-center" style="gap: 15px;">
+                    <div class="mb-3" style="flex: 1 0 300px;">
+                        <iframe width="300" height="200" src="{{ trick.medias }}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
                     </div>
                 </div>
-            </div>
-            {% if trick.secondaryImages %}
-                {% for imagesTrick in trick.secondaryImages %}
-                    <div class="col-12 col-md-6 col-lg-4 mb-3 d-flex flex-column align-items-center">
-                        <img class="trick-image" style="height: 200px;" src="{{ asset('uploads/tricksImg/tricksImg/300x200-' ~ imagesTrick.name) }}" alt="Trick Additional Image">
+
+                <!-- Conteneur pour les images secondaires -->
+                {% if trick.secondaryImages %}
+                    <div id="secondaryImages" class="d-flex flex-wrap flex-column flex-md-row" style="gap: 15px;">
+                        {% for imagesTrick in trick.secondaryImages %}
+                            <div class="mb-3" style="flex: 1 0 300px;">
+                                <img class="img-fluid" style="height: 200px; object-fit: cover; width: 100%;" src="{{ asset('uploads/tricksImg/tricksImg/300x200-' ~ imagesTrick.name) }}" alt="Trick Additional Image">
+                            </div>
+                        {% endfor %}
                     </div>
-                {% endfor %}
-            {% endif %}
+                {% endif %}
+            </div>
         </div>
     </div>
 
-    <div class="container mt-5 mb-5 d-flex justify-content-around align-items-center">
+    <div class="container d-flex justify-content-center align-items-center">
+        <button class="btn btn-primary d-md-none mt-2" id="showMediaBtn">Voir média</button>
+    </div>
+
+    <!-- Informations sur le trick -->
+    <div class="container mt-5 mb-5 d-flex justify-content-around">
         <span class="badge bg-primary">{{ trick.groups.name }}</span>
-        <span class="badge bg-primary">Crée le {{ trick.createdAt|date('d-m-Y') }}</span>
+        <span class="badge bg-primary">Créé le {{ trick.createdAt|date('d-m-Y') }}</span>
         <span class="badge bg-primary">Modifié le {{ trick.editAt|date('d-m-Y') }}</span>
     </div>
 
-    <div class="d-flex justify-content-center align-items-center flex-column mb-5">
-        <hr style="width: 50%; ">
+    <!-- Section des commentaires -->
+    <div class="d-flex flex-column align-items-center mb-5">
+        <hr class="w-50">
 
         <div class="col-md-6">
             {% for message in app.flashes('success') %}
@@ -50,8 +63,8 @@
 
             <h2 class="text-center mt-5 mb-5">Écrire un commentaire</h2>
             {% if app.user %}
-                <form class="d-flex align-items-center p-3 mt-5" id="commentForm">
-                    <input id="content" type="text" class="form-control">
+                <form class="d-flex flex-column flex-md-row align-items-center p-3 mt-5" id="commentForm">
+                    <input id="content" type="text" class="form-control mb-2 mb-md-0" placeholder="Votre commentaire...">
                     <button class="btn btn-primary">Envoyer</button>
                 </form>
             {% else %}
@@ -63,29 +76,46 @@
             {% endif %}
         </div>
 
-        <hr class="mt-5" style="width: 50%; ">
+        <hr class="mt-5 w-50">
     </div>
 
-    <div style="width: 50%" class="container mt-5 mb-5" id="commentaires">
+    <!-- Liste des commentaires -->
+    <div class="container mt-5 mb-5 d-flex flex-column align-items-center" id="commentaires" style="max-width: 800px;">
         {% for comment in comments %}
-            <div class="d-flex align-items-center gap-5 mt-5 w-100 comment {% if loop.index > 4 %}hidden-comment{% endif %}">
-                <img class="rounded-circle" width="5%" src="{{ comment.users.userPicture ? asset('uploads/pictures/' ~ comment.users.userPicture) : asset('img/default-picture.png') }}" alt="User Avatar" onerror="this.src='{{ asset('img/default-picture.png') }}'">
-                <span class="badge bg-dark">{{ comment.users.username }}</span>
-                <p style="margin-left: 100px; margin-bottom: 0">{{ comment.content }}</p>
-                <span class="badge bg-dark ms-auto">Posté le {{ comment.createdAt|date('Y-m-d') }}</span>
+            <div class="d-flex flex-column flex-sm-row align-items-center gap-3 mt-5 w-100 comment {% if loop.index > 4 %}hidden-comment{% endif %}">
+                <img class="rounded-circle" style="max-width: 40px; height: auto;" src="{{ comment.users.userPicture ? asset('uploads/pictures/' ~ comment.users.userPicture) : asset('img/default-picture.png') }}" alt="User Avatar" onerror="this.src='{{ asset('img/default-picture.png') }}'">
+                <div class="d-flex flex-column flex-sm-row flex-grow-1 align-items-center w-100">
+                    <div class="d-flex flex-column flex-sm-row flex-grow-1 align-items-center gap-4">
+                        <span class="badge bg-dark px-2 py-1">{{ comment.users.username }}</span>
+                        <p class="mb-1">{{ comment.content }}</p>
+                    </div>
+                    <span class="badge bg-dark px-2 py-1 ms-sm-auto mt-2 mt-sm-0">Posté le {{ comment.createdAt|date('Y-m-d') }}</span>
+                </div>
             </div>
         {% endfor %}
     </div>
 
     {% if comments|length > 4 %}
-        <div class="d-flex justify-content-center align-items-center" id="loadMoreContainer">
-            <button id="loadMoreComments" class="btn btn-outline-primary mt-5 mb-5" data-offset="4">Afficher plus</button>
+        <div class="d-flex justify-content-center mt-5 mb-5" id="loadMoreContainer">
+            <button id="loadMoreComments" class="btn btn-outline-primary" data-offset="4">Afficher plus</button>
         </div>
     {% endif %}
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script type="module">
+    <script>
         $(document).ready(function() {
+            $('#showMediaBtn').on('click', function() {
+                let $mediaContainer = $('#mediaContainer');
+
+                if ($mediaContainer.hasClass('d-none')) {
+                    $mediaContainer.removeClass('d-none').addClass('d-md-flex');
+                    $(this).text('Cacher média');
+                } else {
+                    $mediaContainer.addClass('d-none').removeClass('d-md-flex');
+                    $(this).text('Voir média');
+                }
+            });
+
             $("#loadMoreComments").on("click", function() {
                 $(".comment.hidden-comment").removeClass("hidden-comment");
                 $("#loadMoreContainer").hide();
