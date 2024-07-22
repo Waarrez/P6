@@ -10,6 +10,7 @@ use App\Form\Trick\TrickHandler;
 use App\Repository\GroupRepository;
 use App\Repository\ImageRepository;
 use App\Repository\TrickRepository;
+use App\Repository\VideoRepository;
 use App\Services\PictureService;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
@@ -34,7 +35,8 @@ class TrickController extends AbstractController
         private readonly EntityManagerInterface $entityManager,
         private readonly Filesystem             $filesystem,
         private readonly PictureService $pictureService,
-        private CsrfTokenManagerInterface $csrfTokenManager
+        private readonly CsrfTokenManagerInterface $csrfTokenManager,
+        private readonly VideoRepository $videoRepository
     ) {}
 
     /**
@@ -251,6 +253,41 @@ class TrickController extends AbstractController
             } else {
                 return new JsonResponse(['error' => 'Erreur de suppression'], 400);
             }
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => 'Erreur de suppression: ' . $e->getMessage()], 500);
+        }
+    }
+
+    #[Route('/trick/removeVideo/{id}', name: "deleteVideo", methods: ['DELETE'])]
+    public function deleteVideo(string $id, Request $request, VideoRepository $videoRepository, EntityManagerInterface $entityManager, CsrfTokenManagerInterface $csrfTokenManager): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if (!$data || !isset($data['_token'])) {
+            return new JsonResponse(['error' => 'Token non fourni'], 400);
+        }
+
+        $token = $data['_token'];
+        if (!$this->csrfTokenManager->isTokenValid(new CsrfToken('delete' . $id, $token))) {
+            return new JsonResponse(['error' => 'Token invalide'], 403);
+        }
+
+        // Validation de l'ID
+        if (!preg_match('/^[a-zA-Z0-9\-]+$/', $id)) {
+            return new JsonResponse(['error' => 'ID invalide'], 400);
+        }
+
+        $video = $this->videoRepository->find($id);
+
+        if (!$video) {
+            return new JsonResponse(['error' => 'Vidéo non trouvée'], 404);
+        }
+
+        try {
+            $this->entityManager->remove($video);
+            $this->entityManager->flush();
+
+            return new JsonResponse(['success' => 'Vidéo supprimée'], 200);
         } catch (\Exception $e) {
             return new JsonResponse(['error' => 'Erreur de suppression: ' . $e->getMessage()], 500);
         }

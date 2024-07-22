@@ -5,6 +5,7 @@ namespace App\Form\Trick;
 use App\Entity\Group;
 use App\Entity\Trick;
 use App\Form\ImagesType;
+use App\Form\VideoType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -50,9 +51,37 @@ class TrickFormType extends AbstractType
                 'required' => false,
                 'label' => false,
             ])
-            ->add('medias', TextType::class, [
-                'label' => false
+            ->add('newVideo', TextType::class, [
+                'label' => false,
+                'mapped' => false,
+                'required' => false,
+                'attr' => [
+                    'placeholder' => 'Ajouter une nouvelle vidéo'
+                ]
             ])
+            ->add('newVideo2', TextType::class, [
+                'label' => false,
+                'mapped' => false,
+                'required' => false,
+                'attr' => [
+                    'placeholder' => 'Ajouter une nouvelle vidéo'
+                ]
+            ])
+            ->add('newVideo3', TextType::class, [
+                'label' => false,
+                'mapped' => false,
+                'required' => false,
+                'attr' => [
+                    'placeholder' => 'Ajouter une nouvelle vidéo'
+                ]
+            ])
+            ->add('videos', CollectionType::class, [
+                'entry_type' => VideoType::class,
+                'label' => false,
+                'allow_add' => true,
+                'allow_delete' => true,
+                'by_reference' => false,
+            ]);
         ;
     }
 

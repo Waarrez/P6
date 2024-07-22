@@ -7,19 +7,51 @@
         <h2>Ajouter une nouvelle figure</h2>
 
         {{ form_start(form, {'attr' : {'class' : 'mt-5'}}) }}
-        <label class="mt-2" for="">Nom de la figure : </label>
-        {{ form_row(form.name, {'attr' : {'class' : 'form-control mt-3'}}) }}
-        <label class="mt-2" for="">Description : </label>
-        {{ form_row(form.content, {'attr' : {'class' : 'form-control mt-3'}}) }}
-        <label class="mt-2" for="">Catégorie : </label>
-        {{ form_row(form.groups, {'attr' : {'class' : 'form-select mt-3'}}) }}
-        <label class="mt-2" for="">Image principal : </label>
-        {{ form_row(form.imageFile, {'attr' : {'class' : 'form-control mt-3'}}) }}
-        <label class="mt-2" for="">Images secondaires : </label>
-        {{ form_row(form.images, {'attr' : {'class' : 'form-control mt-3'}}) }}
-        <label class="mt-2" for="">Vidéos : </label>
-        {{ form_row(form.medias, {'attr' : {'class' : 'form-control mt-3'}}) }}
+
+        <div class="form-group mt-2">
+            <label for="trick_name">Nom de la figure : </label>
+            {{ form_row(form.name, {'attr' : {'class' : 'form-control mt-3'}}) }}
+        </div>
+
+        <div class="form-group mt-2">
+            <label for="trick_content">Description : </label>
+            {{ form_row(form.content, {'attr' : {'class' : 'form-control mt-3'}}) }}
+        </div>
+
+        <div class="form-group mt-2">
+            <label for="trick_groups">Catégorie : </label>
+            {{ form_row(form.groups, {'attr' : {'class' : 'form-select mt-3'}}) }}
+        </div>
+
+        <div class="form-group mt-2">
+            <label for="trick_imageFile">Image principal : </label>
+            {{ form_row(form.imageFile, {'attr' : {'class' : 'form-control mt-3'}}) }}
+        </div>
+
+        <div class="form-group mt-2">
+            <label for="trick_images">Images secondaires : </label>
+            {{ form_row(form.images, {'attr' : {'class' : 'form-control mt-3'}}) }}
+        </div>
+
+        <div class="form-group mt-4">
+            <label for="trick_videos">Vidéos : </label>
+            {{ form_row(form.videos, {'attr' : {'class' : 'form-control mt-3'}}) }}
+        </div>
+
+        <div class="form-group mt-2">
+            {{ form_row(form.newVideo, {'attr' : {'class' : 'form-control mt-3', 'placeholder' : 'Ajouter une nouvelle vidéo'}}) }}
+        </div>
+
+        <div class="form-group mt-2">
+            {{ form_row(form.newVideo2, {'attr' : {'class' : 'form-control mt-3', 'placeholder' : 'Ajouter une nouvelle vidéo'}}) }}
+        </div>
+
+        <div class="form-group mt-2">
+            {{ form_row(form.newVideo3, {'attr' : {'class' : 'form-control mt-3', 'placeholder' : 'Ajouter une nouvelle vidéo'}}) }}
+        </div>
+
         <button class="btn btn-primary mt-5" type="submit">Ajouter</button>
+
         {{ form_end(form) }}
     </div>
 {% endblock %}

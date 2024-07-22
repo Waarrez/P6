@@ -33,10 +33,6 @@ class Trick
     #[Groups("tricks")]
     private ?string $images = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    #[Groups("tricks")]
-    private ?string $medias = null;
-
     #[ORM\ManyToOne(inversedBy: 'tricks')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups("tricks")]
@@ -67,11 +63,18 @@ class Trick
     #[ORM\OneToMany(mappedBy: 'tricks', targetEntity: Image::class, orphanRemoval: true)]
     private Collection $secondaryImages;
 
+    /**
+     * @var Collection<int, Video>
+     */
+    #[ORM\OneToMany(mappedBy: 'tricks', targetEntity: Video::class, cascade: ["persist", "remove"], orphanRemoval: true)]
+    private Collection $videos;
+
     public function __construct()
     {
         $this->id = Ulid::generate();
         $this->comments = new ArrayCollection();
         $this->secondaryImages = new ArrayCollection();
+        $this->videos = new ArrayCollection();
     }
 
     public function getId(): ?string
@@ -111,18 +114,6 @@ class Trick
     public function setImages(string $images): static
     {
         $this->images = $images;
-
-        return $this;
-    }
-
-    public function getMedias(): ?string
-    {
-        return $this->medias;
-    }
-
-    public function setMedias(?string $medias): static
-    {
-        $this->medias = $medias;
 
         return $this;
     }
@@ -237,6 +228,36 @@ class Trick
             // set the owning side to null (unless already changed)
             if ($secondaryImage->getTricks() === $this) {
                 $secondaryImage->setTricks(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Video>
+     */
+    public function getVideos(): Collection
+    {
+        return $this->videos;
+    }
+
+    public function addVideo(Video $video): static
+    {
+        if (!$this->videos->contains($video)) {
+            $this->videos->add($video);
+            $video->setTricks($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVideo(Video $video): static
+    {
+        if ($this->videos->removeElement($video)) {
+            // set the owning side to null (unless already changed)
+            if ($video->getTricks() === $this) {
+                $video->setTricks(null);
             }
         }
 
