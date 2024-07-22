@@ -4,6 +4,7 @@ namespace App\Form\Trick;
 
 use App\Entity\Trick;
 use App\Entity\Image;
+use App\Entity\Video;
 use App\Services\PictureService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -16,7 +17,7 @@ use Symfony\Component\String\Slugger\AsciiSlugger;
 
 final class TrickHandler
 {
-    private $requestStack;
+    private RequestStack $requestStack;
 
     public function __construct(
         private readonly FormFactoryInterface $formFactory,
@@ -37,6 +38,14 @@ final class TrickHandler
         return $this->formFactory->create(TrickFormType::class, $data, $options);
     }
 
+    /**
+     * @param FormInterface $form
+     * @param Request $request
+     * @param Trick $trick
+     * @param string $upload_directory
+     * @param bool $isEdit
+     * @return bool
+     */
     public function handle(FormInterface $form, Request $request, Trick $trick, string $upload_directory, bool $isEdit = false): bool
     {
         $form->handleRequest($request);
@@ -44,9 +53,13 @@ final class TrickHandler
         if ($form->isSubmitted() && $form->isValid()) {
             $file = $form->get('imageFile')->getData();
             $files = $form->get('images')->getData();
+            $newVideos = [
+                $form->get('newVideo')->getData(),
+                $form->get('newVideo2')->getData(),
+                $form->get('newVideo3')->getData()
+            ];
 
             $name = $form->get('name')->getData();
-
             $slug = $this->setSlugForName($name);
             $trick->setSlug($slug);
 
@@ -65,7 +78,6 @@ final class TrickHandler
                         ->setName($newFileName);
 
                     $trick->addSecondaryImage($image);
-
                     $this->entityManager->persist($image);
                 } catch (FileException $e) {
                     error_log($e->getMessage());
@@ -93,6 +105,18 @@ final class TrickHandler
                 $trick->setImages($newFileName);
             }
 
+            // Ajouter les vidéos
+            foreach ($newVideos as $videoUrl) {
+                if ($videoUrl) { // Assurez-vous que l'URL de la vidéo n'est pas vide
+                    $video = new Video();
+                    $video->setTricks($trick)
+                        ->setUrl($videoUrl);
+
+                    $trick->addVideo($video);
+                    $this->entityManager->persist($video);
+                }
+            }
+
             $category = $form->get('groups')->getData();
             $trick->setGroups($category);
 
@@ -111,6 +135,10 @@ final class TrickHandler
         return false;
     }
 
+    /**
+     * @param string $slug
+     * @return AbstractUnicodeString
+     */
     private function setSlugForName(string $slug): AbstractUnicodeString
     {
         $slugger = new AsciiSlugger();

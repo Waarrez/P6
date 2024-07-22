@@ -21,7 +21,9 @@
                 <!-- Conteneur pour les vidéos -->
                 <div class="d-flex flex-wrap flex-column flex-md-row me-md-3 justify-content-center align-items-center" style="gap: 15px;">
                     <div class="mb-3" style="flex: 1 0 300px;">
-                        <iframe width="300" height="200" src="{{ trick.medias }}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                        {% for videos in trick.videos %}
+                            <iframe width="300" height="200" src="{{ videos.url }}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                        {% endfor %}
                     </div>
                 </div>
 
