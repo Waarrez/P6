@@ -17,6 +17,7 @@ class PictureService
         $this->params = $params;
         $this->logger = $logger;
     }
+
     public function add(UploadedFile $picture, ?string $folder = '', ?int $width = 250, ?int $height = 250): string
     {
         $fichier = md5(uniqid(rand(), true)) . '.webp';

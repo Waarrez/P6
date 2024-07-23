@@ -9,6 +9,7 @@ use App\Services\PictureService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -38,14 +39,6 @@ final class TrickHandler
         return $this->formFactory->create(TrickFormType::class, $data, $options);
     }
 
-    /**
-     * @param FormInterface $form
-     * @param Request $request
-     * @param Trick $trick
-     * @param string $upload_directory
-     * @param bool $isEdit
-     * @return bool
-     */
     public function handle(FormInterface $form, Request $request, Trick $trick, string $upload_directory, bool $isEdit = false): bool
     {
         $form->handleRequest($request);
@@ -134,6 +127,7 @@ final class TrickHandler
 
         return false;
     }
+
 
     /**
      * @param string $slug

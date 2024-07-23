@@ -4,7 +4,7 @@ namespace App\Form\Trick;
 
 use App\Entity\Group;
 use App\Entity\Trick;
-use App\Form\ImagesType;
+use App\Form\ImageType;
 use App\Form\VideoType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -75,6 +75,29 @@ class TrickFormType extends AbstractType
                     'placeholder' => 'Ajouter une nouvelle vidéo'
                 ]
             ])
+            ->add('newImage', FileType::class, [
+                'label' => false,
+                'mapped' => false,
+                'required' => false,
+            ])
+            ->add('newImage2', FileType::class, [
+                'label' => false,
+                'mapped' => false,
+                'required' => false,
+            ])
+            ->add('newImage3', FileType::class, [
+                'label' => false,
+                'mapped' => false,
+                'required' => false,
+            ])
+            ->add('secondaryImages', CollectionType::class, [
+                'entry_type' => ImageType::class,
+                'allow_add' => true,
+                'allow_delete' => true,
+                'by_reference' => false,
+                'required' => false,
+                'label' => false,
+            ])
             ->add('videos', CollectionType::class, [
                 'entry_type' => VideoType::class,
                 'label' => false,
@@ -82,7 +105,6 @@ class TrickFormType extends AbstractType
                 'allow_delete' => true,
                 'by_reference' => false,
             ]);
-        ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

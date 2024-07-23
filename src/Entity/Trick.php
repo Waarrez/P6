@@ -60,7 +60,7 @@ class Trick
     /**
      * @var Collection<int, Image>
      */
-    #[ORM\OneToMany(mappedBy: 'tricks', targetEntity: Image::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'tricks', targetEntity: Image::class, cascade: ["persist", "remove"], orphanRemoval: true)]
     private Collection $secondaryImages;
 
     /**
