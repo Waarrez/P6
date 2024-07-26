@@ -21,7 +21,7 @@ class Trick
     #[Groups("tricks")]
     private ?string $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     #[Groups("tricks")]
     private ?string $name = null;
 
@@ -29,7 +29,7 @@ class Trick
     #[Groups("tricks")]
     private ?string $content = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     #[Groups("tricks")]
     private ?string $images = null;
 

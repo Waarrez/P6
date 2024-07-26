@@ -1,69 +1,127 @@
 @startuml
-
-entity "Comment" {
-  +id: string
-  +content: string
-  +username: string
-  +getTrick(): Trick
-  +setTrick(trick: Trick): void
+' Définition des classes
+class Comment {
+    - id: string
+    - content: string
+    - createdAt: \DateTimeImmutable
+    + getId(): string
+    + getContent(): string
+    + setContent(content: string): void
+    + getTrick(): Trick
+    + setTrick(trick: Trick): void
+    + getUsers(): User
+    + setUsers(users: User): void
+    + getCreatedAt(): \DateTimeImmutable
+    + setCreatedAt(createdAt: \DateTimeImmutable): void
 }
 
-entity "Group" {
-  +id: string
-  +name: string
-  +getTricks(): Collection<Trick>
-  +addTrick(trick: Trick): void
-  +removeTrick(trick: Trick): void
+class Group {
+    - id: string
+    - name: string
+    + getId(): string
+    + getName(): string
+    + setName(name: string): void
+    + getTricks(): Collection<Trick>
+    + addTrick(trick: Trick): void
+    + removeTrick(trick: Trick): void
 }
 
-entity "Images" {
-  +id: int
-  +name: string
-  +getTricks(): Trick
-  +setTricks(trick: Trick): void
+class Image {
+    - id: string
+    - name: string
+    + getId(): string
+    + getName(): string
+    + setName(name: string): void
+    + getTricks(): Trick
+    + setTricks(tricks: Trick): void
+    + getFile(): UploadedFile
+    + setFile(file: UploadedFile): void
 }
 
-entity "Trick" {
-  +id: string
-  +name: string
-  +content: string
-  +images: string
-  +medias: string
-  +imageFile: UploadedFile
-  +createdAt: \DateTimeImmutable
-  +editAt: \DateTimeImmutable
-  +getGroups(): Group
-  +setGroups(groups: Group): void
-  +getComments(): Collection<Comment>
-  +addComment(comment: Comment): void
-  +removeComment(comment: Comment): void
-  +getImagesTrick(): Collection<Images>
-  +addImagesTrick(imagesTrick: Images): void
-  +removeImagesTrick(imagesTrick: Images): void
+class Trick {
+    - id: string
+    - name: string
+    - content: string
+    - images: string
+    - createdAt: \DateTimeImmutable
+    - editAt: \DateTimeImmutable
+    - slug: string
+    + getId(): string
+    + getName(): string
+    + setName(name: string): void
+    + getContent(): string
+    + setContent(content: string): void
+    + getImages(): string
+    + setImages(images: string): void
+    + getGroups(): Group
+    + setGroups(groups: Group): void
+    + getImageFile(): UploadedFile
+    + setImageFile(imageFile: UploadedFile): void
+    + getCreatedAt(): \DateTimeImmutable
+    + setCreatedAt(createdAt: \DateTimeImmutable): void
+    + getEditAt(): \DateTimeImmutable
+    + setEditAt(editAt: \DateTimeImmutable): void
+    + getComments(): Collection<Comment>
+    + addComment(comment: Comment): void
+    + removeComment(comment: Comment): void
+    + getSecondaryImages(): Collection<Image>
+    + addSecondaryImage(secondaryImage: Image): void
+    + removeSecondaryImage(secondaryImage: Image): void
+    + getVideos(): Collection<Video>
+    + addVideo(video: Video): void
+    + removeVideo(video: Video): void
 }
 
-entity "User" {
-  +id: string
-  +username: string
-  +roles: array
-  +password: string
-  +email: string
-  +confirmAccount: string
-  +getUserIdentifier(): string
-  +getRoles(): array
-  +setRoles(roles: array): void
-  +getPassword(): string
-  +setPassword(password: string): void
-  +eraseCredentials(): void
-  +getEmail(): string
-  +setEmail(email: string): void
-  +getConfirmAccount(): string
-  +setConfirmAccount(confirmAccount: string): void
+class User {
+    - id: string
+    - username: string
+    - roles: array
+    - password: string
+    - email: string
+    - confirmAccount: string
+    - user_picture: string
+    + getId(): string
+    + getUsername(): string
+    + setUsername(username: string): void
+    + getRoles(): array
+    + setRoles(roles: array): void
+    + getPassword(): string
+    + setPassword(password: string): void
+    + eraseCredentials(): void
+    + getEmail(): string
+    + setEmail(email: string): void
+    + getConfirmAccount(): string
+    + setConfirmAccount(confirmAccount: string): void
+    + getUserPicture(): string
+    + setUserPicture(user_picture: string): void
+    + getComments(): Collection<Comment>
+    + addComment(comment: Comment): void
+    + removeComment(comment: Comment): void
 }
 
-Comment "1" --> "0..*" Trick: trick
-Trick "0..*" --> "1" Group: groups
-Trick "0..*" --> "1" Images: imagesTrick
-Trick "0..*" --> "0..*" Comment: comments
+class Video {
+    - id: int
+    - url: string
+    + getId(): int
+    + getUrl(): string
+    + setUrl(url: string): void
+    + getTricks(): Trick
+    + setTricks(tricks: Trick): void
+}
+
+' Définition des relations entre les classes
+Comment --> Trick : trick (ManyToOne)
+Comment --> User : users (ManyToOne)
+
+Group --> Trick : tricks (OneToMany)
+
+Image --> Trick : tricks (ManyToOne)
+
+Trick --> Group : groups (ManyToOne)
+Trick --> Comment : comments (OneToMany)
+Trick --> Image : secondaryImages (OneToMany)
+Trick --> Video : videos (OneToMany)
+
+User --> Comment : comments (OneToMany)
 
 @enduml

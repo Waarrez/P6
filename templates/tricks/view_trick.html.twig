@@ -5,9 +5,21 @@
 {% block body %}
 
     <!-- Header avec image de fond -->
-    <div class="text-center position-relative">
-        <h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold">{{ trick.name }}</h1>
-        <img class="w-100" style="max-height: 70vh; object-fit: cover;" src="{{ asset('uploads/' ~ trick.images) }}" alt="Trick Image" onerror="this.src='{{ asset('img/default-picture.png') }}'">
+    <div class="text-center" style="position: relative;">
+        <div class="bg-dark p-2 rounded" style="position: absolute; top: 10px; right: 20px">
+            <a style="margin-right: 10px" href="{{ path('editTrick', {'slug' : trick.slug}) }}">
+                <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512" fill="#FFFFFF">
+                    <path d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z"/>
+                </svg>
+            </a>
+            <a data-trick="{{ trick.id }}" class="confirmationButton" style="margin-left: 5px" href="">
+                <svg fill="#FFFFFF" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512">
+                    <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/>
+                </svg>
+            </a>
+        </div>
+        <h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold bg-dark p-3 rounded">{{ trick.name }}</h1>
+        <img class="trick-main-image" style="width: 100%; height: auto; max-height: 70vh; object-fit: cover;" src="{{ asset('uploads/' ~ trick.images) }}" alt="Trick Image" onerror="this.src='{{ asset('img/noi_image.jpg') }}'">
     </div>
 
     <!-- Contenu principal -->
@@ -15,31 +27,46 @@
         {{ trick.content }}
     </div>
 
-    <div class="container-fluid mt-5">
+    <div class="container mt-5">
         <div id="mediaContainer" class="d-none d-md-flex">
-            <div class="d-flex flex-column flex-md-row mx-auto">
-                <!-- Conteneur pour les vidéos -->
-                <div class="d-flex flex-wrap flex-column flex-md-row me-md-3 justify-content-center align-items-center" style="gap: 15px;">
-                    <div class="mb-3" style="flex: 1 0 300px;">
-                        {% for videos in trick.videos %}
-                            <iframe width="300" height="200" src="{{ videos.url }}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-                        {% endfor %}
-                    </div>
-                </div>
+            <div class="row d-flex jus">
+                {% set videoCount = trick.videos|length %}
+                {% set imageCount = trick.secondaryImages|length %}
+                {% set totalCount = videoCount + imageCount %}
 
-                <!-- Conteneur pour les images secondaires -->
-                {% if trick.secondaryImages %}
-                    <div id="secondaryImages" class="d-flex flex-wrap flex-column flex-md-row" style="gap: 15px;">
-                        {% for imagesTrick in trick.secondaryImages %}
-                            <div class="mb-3" style="flex: 1 0 300px;">
-                                <img class="img-fluid" style="height: 200px; object-fit: cover; width: 100%;" src="{{ asset('uploads/tricksImg/tricksImg/300x200-' ~ imagesTrick.name) }}" alt="Trick Additional Image">
-                            </div>
-                        {% endfor %}
-                    </div>
+                {% set columnClass = 'col-12 col-sm-6' %}
+                {% if totalCount == 2 and videoCount == 1 and imageCount == 1 %}
+                    {% set columnClass = 'col-12 col-md-6' %}
+                {% else %}
+                    {% set columnClass = 'col-12 col-md-4' %}
                 {% endif %}
+
+                {% set mediaItems = [] %}
+                {% for video in trick.videos %}
+                    {% set mediaItems = mediaItems|merge([{'type': 'video', 'url': video.url}]) %}
+                {% endfor %}
+                {% for image in trick.secondaryImages %}
+                    {% set mediaItems = mediaItems|merge([{'type': 'image', 'name': image.name}]) %}
+                {% endfor %}
+
+                {% for media in mediaItems %}
+                    <div class="{{ columnClass }} mb-3 d-flex justify-content-center">
+                        {% if media.type == 'video' %}
+                            <div class="embed-responsive embed-responsive-16by9" style="max-width: 100%;">
+                                <iframe height="200" width="300" class="embed-responsive-item" src="{{ media.url }}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                            </div>
+                        {% else %}
+                            <div style="max-width: 100%;">
+                                <img class="img-fluid" src="{{ asset('uploads/tricksImg/tricksImg/300x200-' ~ media.name) }}" alt="Trick Additional Image">
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>
+
+
 
     <div class="container d-flex justify-content-center align-items-center">
         <button class="btn btn-primary d-md-none mt-2" id="showMediaBtn">Voir média</button>
@@ -106,6 +133,15 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
+            $(".confirmationButton").on("click", function(event) {
+                event.preventDefault();
+                const confirmation = confirm("Êtes-vous sûr de supprimer cette figure ?");
+                if (confirmation) {
+                    const idTrick = $(this).data('trick');
+                    window.location.href = "/trick/remove/" + idTrick;
+                }
+            });
+
             $('#showMediaBtn').on('click', function() {
                 let $mediaContainer = $('#mediaContainer');
 

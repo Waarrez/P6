@@ -88,12 +88,12 @@ class PictureService
         $mini = $path . '/tricksImg/' . $width . 'x' . $height . '-' . $fichier;
         $original = $path . '/' . $fichier;
 
-        $this->logger->info('Mini file path for deletion:', ['path' => $mini]);
+        $this->logger->info('File path for deletion:', ['path' => $mini]);
         if (file_exists($mini)) {
             unlink($mini);
             $success = true;
         } else {
-            $this->logger->warning('Mini file not found:', ['file' => $mini]);
+            $this->logger->warning('File not found:', ['file' => $mini]);
         }
 
         $this->logger->info('Original file path for deletion:', ['path' => $original]);

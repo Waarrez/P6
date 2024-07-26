@@ -1,0 +1,44 @@
+@startuml
+actor User
+
+participant "TrickController" as Controller
+participant "TrickRepository" as TrickRepo
+participant "GroupRepository" as GroupRepo
+participant "TrickHandler" as Handler
+participant "Auth" as Auth
+participant "Redirect" as Redirect
+
+User -> Controller: Accède à la page d'édition d'un trick
+Controller -> Auth: Vérifie si l'utilisateur est authentifié
+alt Utilisateur authentifié
+    Auth -> Controller: Utilisateur authentifié
+    Controller -> TrickRepo: Vérifie si le trick existe
+    alt Trick existe
+        TrickRepo -> Controller: Trick trouvé
+        Controller -> GroupRepo: Récupère la liste des groupes
+        GroupRepo -> Controller: Liste des groupes
+        Controller -> Handler: Prépare le formulaire pour le trick
+        Handler -> Controller: Formulaire prêt
+
+        User -> Controller: Soumet le formulaire pour modification
+        Controller -> Handler: Traite le formulaire
+        Handler -> Controller: Résultat de la modification
+
+        alt Modification réussie
+            Controller -> Redirect: Redirige vers la liste des tricks
+            Redirect -> User: Redirection vers la liste des tricks
+        else Échec de la modification
+            Controller -> User: Affiche un message d'erreur sur la même page
+        end
+    else Trick n'existe pas
+        TrickRepo -> Controller: Trick non trouvé
+        Controller -> Redirect: Redirige vers la liste des tricks
+        Redirect -> User: Redirection vers la liste des tricks + message d'erreur
+    end
+else Utilisateur non authentifié
+    Auth -> Controller: Utilisateur non authentifié
+    Controller -> Redirect: Redirige vers /login
+    Redirect -> User: Redirection vers /login
+end
+
+@enduml

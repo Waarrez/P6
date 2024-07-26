@@ -138,7 +138,7 @@ class SecurityController extends AbstractController
 
         $user = $this->userRepository->findOneBy(["confirmAccount" => $token]);
 
-        if ($user === true) {
+        if ($user === null) {
             $this->addFlash("error", "Le lien n'est plus disponible.");
             return $this->redirectToRoute('home.index');
         }

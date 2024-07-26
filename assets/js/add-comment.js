@@ -17,24 +17,39 @@ document.getElementById('commentForm').addEventListener('submit', function(event
     xhttp.onreadystatechange = function() {
         if (this.readyState === 4 && this.status === 200) {
             let response = JSON.parse(this.responseText);
+            let newComments = response.comments;
 
-            if (response.success) {
-                // Affiche un message de succès temporaire
-                let successMessage = document.createElement('div');
-                successMessage.classList.add('alert', 'alert-success');
-                successMessage.textContent = 'Votre commentaire a bien été ajouté !';
-                document.getElementById('commentaires').appendChild(successMessage);
+            let commentairesDiv = document.getElementById('commentaires');
+            commentairesDiv.innerHTML = '<div class="alert alert-success">Votre commentaire a bien été ajouté !</div>';
 
-                window.location.reload();
-            } else {
-                alert('Une erreur est survenue. Veuillez réessayer.');
-            }
+            newComments.forEach(function(comment) {
+                let newCommentDiv = document.createElement('div');
+                newCommentDiv.classList.add('d-flex', 'align-items-center', 'gap-5', 'mt-5');
+                newCommentDiv.style.backgroundColor = '#f7f7f9';
+
+                let imgSrc = comment.userPicture
+                    ? '/uploads/pictures/' + comment.userPicture
+                    : '/img/default-picture.png';
+
+
+                newCommentDiv.innerHTML = `
+                <img class="rounded-circle" width="5%" src="${imgSrc}" alt="Avatar" onerror="this.src='/img/default-picture.png'">
+                <span class="badge bg-dark">${comment.username}</span>
+                <p style="margin-left: 100px; margin-bottom: 0">${comment.content}</p>
+            `;
+
+                commentairesDiv.appendChild(newCommentDiv);
+
+                setTimeout(() => {
+                    window.location.reload()
+                }, 1000)
+            });
         }
     };
 
     xhttp.open('POST', '/add-comment', true);
     xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    xhttp.send('slug=' + encodeURIComponent(slug) + '&content=' + encodeURIComponent(content));
+    xhttp.send('slug=' + slug + '&content=' + content);
 });
 
 let comments = document.getElementsByClassName("comments");

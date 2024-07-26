@@ -2,6 +2,10 @@
     display: none;
 }
 
+ul, li {
+    list-style-type: none;
+}
+
 #card > :nth-child(-n+4) {
     display: flex;
 }

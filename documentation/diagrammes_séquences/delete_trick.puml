@@ -1,0 +1,51 @@
+@startuml
+actor Utilisateur
+
+participant "TrickController" as Controleur
+participant "TrickRepository" as RepoTrick
+participant "EntityManager" as Gestionnaire
+participant "Filesystem" as Fichiers
+participant "Redirect" as Redirection
+
+Utilisateur -> Controleur: Demande la suppression (ID)
+Controleur -> RepoTrick: Trouver la figure
+alt Figure trouvée
+    RepoTrick -> Controleur: Figure trouvée
+    Controleur -> RepoTrick: Récupérer commentaires
+    RepoTrick -> Controleur: Commentaires trouvés
+
+    alt Commentaires présents
+        Controleur -> Gestionnaire: Supprimer commentaires
+        Gestionnaire -> Controleur: Commentaires supprimés
+    end
+
+    Controleur -> Fichiers: Vérifier image
+    alt Image présente
+        Fichiers -> Controleur: Image trouvée
+        Controleur -> Fichiers: Supprimer image
+        alt Suppression réussie
+            Fichiers -> Controleur: Image supprimée
+        else Échec suppression
+            Fichiers -> Controleur: Erreur suppression
+            Controleur -> Utilisateur: Message erreur (image)
+            Controleur -> Redirection: Vers page d'accueil
+            Redirection -> Utilisateur: Redirection page d'accueil
+        end
+    else Image absente
+        Fichiers -> Controleur: Pas d'image
+    end
+
+    Controleur -> Gestionnaire: Supprimer figure
+    Gestionnaire -> Controleur: Figure supprimée
+    Controleur -> Utilisateur: Message succès
+    Controleur -> Redirection: Vers liste figures
+    Redirection -> Utilisateur: Redirection liste figures
+
+else Figure non trouvée
+    RepoTrick -> Controleur: Figure non trouvée
+    Controleur -> Utilisateur: Message erreur (figure)
+    Controleur -> Redirection: Vers liste figures
+    Redirection -> Utilisateur: Redirection liste figures
+end
+
+@enduml

@@ -40,6 +40,7 @@ class TrickFormType extends AbstractType
                         'mimeTypes' => [
                             'image/jpeg',
                             'image/png',
+                            'image/webp'
                         ],
                         'mimeTypesMessage' => 'Veuillez télécharger une image valide (JPEG, PNG).',
                     ]),
@@ -50,45 +51,6 @@ class TrickFormType extends AbstractType
                 'mapped' => false,
                 'required' => false,
                 'label' => false,
-            ])
-            ->add('newVideo', TextType::class, [
-                'label' => false,
-                'mapped' => false,
-                'required' => false,
-                'attr' => [
-                    'placeholder' => 'Ajouter une nouvelle vidéo'
-                ]
-            ])
-            ->add('newVideo2', TextType::class, [
-                'label' => false,
-                'mapped' => false,
-                'required' => false,
-                'attr' => [
-                    'placeholder' => 'Ajouter une nouvelle vidéo'
-                ]
-            ])
-            ->add('newVideo3', TextType::class, [
-                'label' => false,
-                'mapped' => false,
-                'required' => false,
-                'attr' => [
-                    'placeholder' => 'Ajouter une nouvelle vidéo'
-                ]
-            ])
-            ->add('newImage', FileType::class, [
-                'label' => false,
-                'mapped' => false,
-                'required' => false,
-            ])
-            ->add('newImage2', FileType::class, [
-                'label' => false,
-                'mapped' => false,
-                'required' => false,
-            ])
-            ->add('newImage3', FileType::class, [
-                'label' => false,
-                'mapped' => false,
-                'required' => false,
             ])
             ->add('secondaryImages', CollectionType::class, [
                 'entry_type' => ImageType::class,

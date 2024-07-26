@@ -82,10 +82,11 @@ class TrickController extends AbstractController
     {
         $trick = $this->trickRepository->getTrickBySlug($slug);
 
-        if($trick->getComments() && $trick) {
-            $comments = $trick->getComments();
+        if ($trick !== null) {
+            $comments = $trick->getComments() ?? [];
         } else {
-            $comments = [];
+            $this->addFlash('error', "La figure n'a pas été trouvé !");
+            return $this->redirectToRoute('tricks');
         }
 
         return $this->render('tricks/view_trick.html.twig', [
@@ -113,7 +114,7 @@ class TrickController extends AbstractController
 
         $form = $this->trickHandler->prepare($trick);
 
-        if ($this->trickHandler->handle($form, $request, $trick, $this->getParameter("upload_directory"))) {
+        if ($this->trickHandler->handle($form, $request, $trick, $this->getParameter("upload_directory"), true)) {
             $this->addFlash("success", "La figure à bien été modifié !");
             return $this->redirectToRoute('tricks');
         }
@@ -207,7 +208,36 @@ class TrickController extends AbstractController
 
         return new JsonResponse([
             'message' => 'Commentaire ajouté avec succès',
+            'success' => true,
             'comments' => $updatedComments,
+        ]);
+    }
+
+    #[Route('/trick/removePrimaryImage/{name}', name: "deletePrimaryImage", methods: ['DELETE'])]
+    public function deletePrimaryImage(string $name): Response
+    {
+        if (empty($name)) {
+            return $this->json(['success' => false, 'error' => 'Le nom de l\'image est manquant.']);
+        }
+
+        $data = $this->trickRepository->findOneBy(['images' => $name]);
+
+        if (!$data) {
+            return $this->json(['success' => false, 'error' => 'Image non trouvée.']);
+        }
+
+        $existingImagePath = $this->getParameter('upload_directory') . '/' . $data->getImages();
+        if (file_exists($existingImagePath)) {
+            unlink($existingImagePath);
+        }
+
+        $data->setImages('');
+        $this->entityManager->persist($data);
+        $this->entityManager->flush();
+
+        return $this->json([
+            'success' => true,
+            'redirect' => $this->generateUrl('editTrick', ['slug' => $data->getSlug()])
         ]);
     }
 
@@ -226,14 +256,17 @@ class TrickController extends AbstractController
             return new JsonResponse(['error' => 'Token non fourni'], 400);
         }
 
-        // Validation de l'ID
         if (!preg_match('/^[a-zA-Z0-9\-]+$/', $id)) {
             return new JsonResponse(['error' => 'ID invalide'], 400);
         }
 
+        // Debug: Vérifiez l'ID
+        error_log("ID reçu pour suppression : " . $id);
+
         $image = $this->imageRepository->find($id);
 
         if (!$image) {
+            error_log("Image non trouvée avec l'ID : " . $id);
             return new JsonResponse(['error' => 'Image non trouvée'], 404);
         }
 
@@ -248,7 +281,6 @@ class TrickController extends AbstractController
             if ($this->pictureService->delete($name, 'tricksImg', 300, 200)) {
                 $this->entityManager->remove($image);
                 $this->entityManager->flush();
-
                 return new JsonResponse(['success' => 'Image supprimée'], 200);
             } else {
                 return new JsonResponse(['error' => 'Erreur de suppression'], 400);
@@ -259,7 +291,7 @@ class TrickController extends AbstractController
     }
 
     #[Route('/trick/removeVideo/{id}', name: "deleteVideo", methods: ['DELETE'])]
-    public function deleteVideo(string $id, Request $request, VideoRepository $videoRepository, EntityManagerInterface $entityManager, CsrfTokenManagerInterface $csrfTokenManager): JsonResponse
+    public function deleteVideo(string $id, Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -272,7 +304,6 @@ class TrickController extends AbstractController
             return new JsonResponse(['error' => 'Token invalide'], 403);
         }
 
-        // Validation de l'ID
         if (!preg_match('/^[a-zA-Z0-9\-]+$/', $id)) {
             return new JsonResponse(['error' => 'ID invalide'], 400);
         }

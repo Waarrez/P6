@@ -1,0 +1,25 @@
+@startuml
+actor Utilisateur
+
+participant "SecurityController" as Controleur
+participant "UserService" as ServiceUtilisateur
+participant "TokenService" as ServiceToken
+participant "UserRepository" as Repo
+participant "Redirect" as Redirection
+
+Utilisateur -> Controleur: Clique sur le lien de confirmation (avec token)
+Controleur -> ServiceToken: Valider le token de confirmation
+alt Token valide
+    ServiceToken -> Repo: Rechercher utilisateur par token
+    Repo -> ServiceUtilisateur: Utilisateur trouvé
+    ServiceUtilisateur -> Repo: Marquer l'utilisateur comme confirmé
+    Repo -> ServiceUtilisateur: Utilisateur mis à jour
+    ServiceUtilisateur -> Controleur: Confirmation réussie
+    Controleur -> Redirection: Rediriger vers la page de confirmation réussie
+    Redirection -> Utilisateur: Afficher message de succès (compte confirmé)
+else Token invalide
+    ServiceToken -> Controleur: Token invalide
+    Controleur -> Utilisateur: Afficher message d'erreur (token invalide)
+end
+
+@enduml

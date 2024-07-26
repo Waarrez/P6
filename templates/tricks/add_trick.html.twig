@@ -1,9 +1,15 @@
 {% extends 'base.html.twig' %}
 
-{% block title "Ajouter une nouvelle figure" %}
+{% block title %}Ajouter une nouvelle figure{% endblock %}
 
 {% block body %}
     <div class="container text-center mt-5 mb-5 col-md-4">
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger">
+                {{ message }}
+            </div>
+        {% endfor %}
+
         <h2>Ajouter une nouvelle figure</h2>
 
         {{ form_start(form, {'attr' : {'class' : 'mt-5'}}) }}
@@ -28,30 +34,67 @@
             {{ form_row(form.imageFile, {'attr' : {'class' : 'form-control mt-3'}}) }}
         </div>
 
-        <div class="form-group mt-2">
-            <label for="trick_images">Images secondaires : </label>
+        <div class="form-group mt-4">
+            <label for="trick_imageFile">Images secondaires : </label>
             {{ form_row(form.images, {'attr' : {'class' : 'form-control mt-3'}}) }}
         </div>
 
-        <div class="form-group mt-4">
+        <div class="form-group mt-5">
             <label for="trick_videos">Vidéos : </label>
-            {{ form_row(form.videos, {'attr' : {'class' : 'form-control mt-3'}}) }}
-        </div>
-
-        <div class="form-group mt-2">
-            {{ form_row(form.newVideo, {'attr' : {'class' : 'form-control mt-3', 'placeholder' : 'Ajouter une nouvelle vidéo'}}) }}
-        </div>
-
-        <div class="form-group mt-2">
-            {{ form_row(form.newVideo2, {'attr' : {'class' : 'form-control mt-3', 'placeholder' : 'Ajouter une nouvelle vidéo'}}) }}
-        </div>
-
-        <div class="form-group mt-2">
-            {{ form_row(form.newVideo3, {'attr' : {'class' : 'form-control mt-3', 'placeholder' : 'Ajouter une nouvelle vidéo'}}) }}
+            <ul class="videos" data-prototype="{{ form_widget(form.videos.vars.prototype)|e }}">
+                {% for video in form.videos %}
+                    <li>
+                        {{ form_row(video, {'attr' : {'class' : 'form-control mt-5 mb-5'}}) }}
+                    </li>
+                {% endfor %}
+            </ul>
+            <button type="button" id="add-video-btn" class="btn btn-outline-dark mt-4">Ajouter une vidéo</button>
         </div>
 
         <button class="btn btn-primary mt-5" type="submit">Ajouter</button>
 
         {{ form_end(form) }}
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script type="module">
+            $(document).ready(function() {
+                let $collectionHolder = $('ul.videos');
+                let $addVideoButton = $('#add-video-btn');
+                let prototype = $collectionHolder.data('prototype');
+                let index = $collectionHolder.find('li').length;
+
+                $collectionHolder.data('index', index);
+
+                $addVideoButton.on('click', function(e) {
+                    e.preventDefault();
+                    addVideoForm($collectionHolder, $addVideoButton);
+                });
+
+                function addVideoForm($collectionHolder, $addVideoButton) {
+                    let prototype = $collectionHolder.data('prototype');
+                    let index = $collectionHolder.data('index');
+                    let newForm = prototype.replace(/__name__/g, index);
+                    $collectionHolder.data('index', index + 1);
+
+                    let $newFormLi = $('<li></li>').append(newForm);
+                    addRemoveButton($newFormLi);
+                    $addVideoButton.before($newFormLi);
+                }
+
+                function addRemoveButton($formLi) {
+                    let $removeButton = $('<button type="button" class="btn btn-danger mt-5 mb-5">Supprimer cette vidéo</button>');
+                    $formLi.append($removeButton);
+
+                    $removeButton.on('click', function(e) {
+                        e.preventDefault();
+                        $formLi.remove();
+                    });
+                }
+
+                $collectionHolder.find('li').each(function() {
+                    addRemoveButton($(this));
+                });
+            });
+        </script>
     </div>
 {% endblock %}

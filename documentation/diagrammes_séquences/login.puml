@@ -1,0 +1,40 @@
+@startuml
+actor Utilisateur
+
+participant "SecurityController" as Controleur
+participant "AuthService" as AuthService
+participant "UserRepository" as Repo
+participant "Redirect" as Redirection
+
+Utilisateur -> Controleur: Accède à la page de connexion
+Controleur -> Utilisateur: Affiche le formulaire de connexion
+
+Utilisateur -> Controleur: Soumet les informations de connexion (email et mot de passe)
+Controleur -> AuthService: Authentifier utilisateur(nom d'utilisateur, mot de passe)
+
+alt Utilisateur existe
+    AuthService -> Repo: Rechercher utilisateur par nom d'utilisateur
+    Repo -> AuthService: Utilisateur trouvé
+    AuthService -> AuthService: Vérifier mot de passe
+    alt Mot de passe correct
+        AuthService -> Repo: Vérifier si l'utilisateur est confirmé
+        alt Utilisateur confirmé
+            Repo -> AuthService: Utilisateur confirmé
+            AuthService -> Controleur: Authentification réussie
+            Controleur -> Redirection: Rediriger vers la page d'accueil
+            Redirection -> Utilisateur: Redirection vers la page d'accueil
+        else Utilisateur non confirmé
+            Repo -> AuthService: Utilisateur non confirmé
+            AuthService -> Controleur: Erreur de confirmation
+            Controleur -> Utilisateur: Afficher message d'erreur (compte non confirmé)
+        end
+    else Mot de passe incorrect
+        AuthService -> Controleur: Erreur d'authentification
+        Controleur -> Utilisateur: Afficher message d'erreur (mot de passe incorrect)
+    end
+else Utilisateur non trouvé
+    AuthService -> Controleur: Utilisateur non trouvé
+    Controleur -> Utilisateur: Afficher message d'erreur (utilisateur non trouvé)
+end
+
+@enduml

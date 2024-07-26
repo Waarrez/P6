@@ -1,0 +1,32 @@
+@startuml
+actor Utilisateur
+
+participant "TrickController" as Controleur
+participant "Auth" as Auth
+participant "Twig" as Twig
+participant "Redirect" as Redirection
+
+Utilisateur -> Controleur: Accéder à /addTrick (GET)
+Controleur -> Auth: Vérifier l'authentification
+alt Authentifié
+    Auth -> Controleur: Utilisateur authentifié
+    Controleur -> Utilisateur: Afficher le formulaire d'ajout de trick
+
+    Utilisateur -> Controleur: Soumettre le formulaire (POST)
+    Controleur -> Auth: Traiter la demande d'ajout de trick
+    Auth -> Controleur: Retourner le résultat
+
+    alt Succès
+        Controleur -> Redirection: Rediriger vers /tricks
+        Redirection -> Utilisateur: Rediriger vers /tricks
+    else Échec
+        Controleur -> Twig: Afficher le formulaire d'ajout de trick
+        Twig -> Utilisateur: Afficher le formulaire d'ajout de trick
+    end
+else Non authentifié
+    Auth -> Controleur: Utilisateur non authentifié
+    Controleur -> Redirection: Rediriger vers /login
+    Redirection -> Utilisateur: Rediriger vers /login
+end
+
+@enduml
