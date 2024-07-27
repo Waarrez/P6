@@ -12,5 +12,6 @@ add_comment:
 not_found:
     path: /{wildcard}
     controller: App\Controller\ErrorController::error404
+    methods: ['GET']
     requirements:
         wildcard: ".*"
