@@ -14,84 +14,12 @@
     {% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg bg-dark d-none d-sm-block" data-bs-theme="dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{{ path('home.index') }}">Snowtricks</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarColor02">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ path('home.index') }}">Accueil</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Figures</a>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="{{ path('tricks') }}">Toutes les figures</a>
-                            <a class="dropdown-item" href="{{ path('addTrick') }}">Ajouter une figure</a>
-                        </div>
-                    </li>
-                    {% if app.user %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ path('app_logout') }}">Déconnexion</a>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ path('home.register') }}">Inscription</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ path('app_login') }}">Connexion</a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </div>
-        </div>
-    </nav>
+
+    {% include "components/navbar/navbar.html.twig" %}
 
     {% block body %}{% endblock %}
 
-    <footer class="footer bg-primary d-flex flex-column justify-content-center align-items-center">
-        <div class="d-flex flex-column d-sm-none">
-            <div class="d-flex justify-content-around align-items-center w-100 gap-5">
-                <a href="{{ path('home.index') }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="30" height="30" viewBox="0 0 50 50" fill="#FFFFFF">
-                        <path d="M 25 1.0507812 C 24.7825 1.0507812 24.565859 1.1197656 24.380859 1.2597656 L 1.3808594 19.210938 C 0.95085938 19.550938 0.8709375 20.179141 1.2109375 20.619141 C 1.5509375 21.049141 2.1791406 21.129062 2.6191406 20.789062 L 4 19.710938 L 4 46 C 4 46.55 4.45 47 5 47 L 19 47 L 19 29 L 31 29 L 31 47 L 45 47 C 45.55 47 46 46.55 46 46 L 46 19.710938 L 47.380859 20.789062 C 47.570859 20.929063 47.78 21 48 21 C 48.3 21 48.589063 20.869141 48.789062 20.619141 C 49.129063 20.179141 49.049141 19.550938 48.619141 19.210938 L 25.619141 1.2597656 C 25.434141 1.1197656 25.2175 1.0507812 25 1.0507812 z M 35 5 L 35 6.0507812 L 41 10.730469 L 41 5 L 35 5 z"></path>
-                    </svg>
-                </a>
-                <a href="{{ path('addTrick') }}">
-                    <svg fill="#FFFFFF" height="30" width="30" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 471.652 471.652" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <path d="M449.532,31.12l-9-9c-14.265-14.263-32.831-22.119-52.28-22.119c-21.602,0-42.208,9.858-56.536,27.046l-92.873,111.411 c-25.165,30.188-70.197,75.22-100.384,100.384L27.048,331.716c-16.459,13.72-26.038,32.648-26.973,53.298 c-0.936,20.65,6.895,40.366,22.045,55.518l9,9c14.263,14.262,32.829,22.118,52.279,22.119c0.003,0,0.003,0,0.006,0 c21.598,0,42.203-9.858,56.53-27.046l92.874-111.411c25.165-30.188,70.197-75.22,100.384-100.384l111.411-92.873 c16.459-13.72,26.038-32.648,26.973-53.298C472.513,65.988,464.683,46.272,449.532,31.12z M455.594,85.914 c-0.729,16.104-8.271,30.925-21.233,41.732L322.949,220.52c-30.803,25.677-76.752,71.627-102.429,102.429L127.646,434.36 c-11.279,13.531-27.404,21.291-44.241,21.291c-0.001,0-0.003,0-0.005,0c-15.177-0.001-29.726-6.192-40.966-17.433l-9-9 c-11.935-11.934-18.105-27.376-17.376-43.48c0.729-16.104,8.271-30.925,21.233-41.732l111.411-92.874 c30.803-25.677,76.752-71.627,102.429-102.429l92.873-111.411c11.28-13.531,27.407-21.291,44.247-21.291 c15.176,0,29.725,6.191,40.966,17.433l9,9C450.152,54.368,456.323,69.81,455.594,85.914z"></path> <path d="M267.826,163.826c-13.233,0-24,10.766-24,24v32c0,13.234,10.767,24,24,24s24-10.766,24-24v-32 C291.826,174.592,281.059,163.826,267.826,163.826z M267.826,179.826c4.411,0,8,3.589,8,8h-16 C259.826,183.415,263.415,179.826,267.826,179.826z M267.826,227.826c-4.411,0-8-3.589-8-8v-16h16v16 C275.826,224.237,272.237,227.826,267.826,227.826z"></path> <path d="M203.826,227.826c-13.233,0-24,10.766-24,24v32c0,13.234,10.767,24,24,24s24-10.766,24-24v-32 C227.826,238.592,217.059,227.826,203.826,227.826z M203.826,243.826c4.411,0,8,3.589,8,8h-16 C195.826,247.415,199.415,243.826,203.826,243.826z M203.826,291.826c-4.411,0-8-3.589-8-8v-16h16v16 C211.826,288.237,208.237,291.826,203.826,291.826z"></path> </g> </g></svg>
-                </a>
-                {% if app.user %}
-                    <a href="{{ path('app_logout') }}">
-                        <svg viewBox="0 0 24 24" height="30" width="30" fill="#FFFFFF" xmlns="http://www.w3.org/2000/svg">
-                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                            <g id="SVGRepo_iconCarrier">
-                                <path fill-rule="evenodd" clip-rule="evenodd" d="M16.125 12C16.125 11.5858 15.7892 11.25 15.375 11.25L4.40244 11.25L6.36309 9.56944C6.67759 9.29988 6.71401 8.8264 6.44444 8.51191C6.17488 8.19741 5.7014 8.16099 5.38691 8.43056L1.88691 11.4306C1.72067 11.573 1.625 11.7811 1.625 12C1.625 12.2189 1.72067 12.427 1.88691 12.5694L5.38691 15.5694C5.7014 15.839 6.17488 15.8026 6.44444 15.4881C6.71401 15.1736 6.67759 14.7001 6.36309 14.4306L4.40244 12.75L15.375 12.75C15.7892 12.75 16.125 12.4142 16.125 12Z" fill="#FFFFFF"></path>
-                                <path d="M9.375 8C9.375 8.70219 9.375 9.05329 9.54351 9.3055C9.61648 9.41471 9.71025 9.50848 9.81946 9.58145C10.0717 9.74996 10.4228 9.74996 11.125 9.74996L15.375 9.74996C16.6176 9.74996 17.625 10.7573 17.625 12C17.625 13.2426 16.6176 14.25 15.375 14.25L11.125 14.25C10.4228 14.25 10.0716 14.25 9.8194 14.4185C9.71023 14.4915 9.6165 14.5852 9.54355 14.6944C9.375 14.9466 9.375 15.2977 9.375 16C9.375 18.8284 9.375 20.2426 10.2537 21.1213C11.1324 22 12.5464 22 15.3748 22L16.3748 22C19.2032 22 20.6174 22 21.4961 21.1213C22.3748 20.2426 22.3748 18.8284 22.3748 16L22.3748 8C22.3748 5.17158 22.3748 3.75736 21.4961 2.87868C20.6174 2 19.2032 2 16.3748 2L15.3748 2C12.5464 2 11.1324 2 10.2537 2.87868C9.375 3.75736 9.375 5.17157 9.375 8Z" fill="#FFFFFF"></path>
-                            </g>
-                        </svg>
-                    </a>
-                {% else %}
-                    <a href="{{ path('app_login') }}">
-                        <svg height="30" width="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                            <g id="SVGRepo_iconCarrier">
-                                <path fill-rule="evenodd" clip-rule="evenodd" d="M1.625 12C1.625 12.4142 1.96079 12.75 2.375 12.75L13.3476 12.75L11.3869 14.4306C11.0724 14.7001 11.036 15.1736 11.3056 15.4881C11.5751 15.8026 12.0486 15.839 12.3631 15.5694L15.8631 12.5694C16.0293 12.427 16.125 12.2189 16.125 12C16.125 11.7811 16.0293 11.573 15.8631 11.4306L12.3631 8.43056C12.0486 8.16099 11.5751 8.19741 11.3056 8.51191C11.036 8.8264 11.0724 9.29988 11.3869 9.56944L13.3476 11.25L2.375 11.25C1.96079 11.25 1.625 11.5858 1.625 12Z" fill="#FFFFFF"></path>
-                                <path d="M9.375 9.75004L9.75328 9.75004C9.49473 9.01645 9.6241 8.16876 10.1667 7.53576C10.9754 6.59228 12.3958 6.48301 13.3393 7.29171L16.8393 10.2917C17.338 10.7192 17.625 11.3432 17.625 12C17.625 12.6569 17.338 13.2809 16.8393 13.7084L13.3393 16.7084C12.3958 17.5171 10.9754 17.4078 10.1667 16.4643C9.6241 15.8313 9.49473 14.9836 9.75328 14.25L9.375 14.25L9.375 16C9.375 18.8284 9.375 20.2426 10.2537 21.1213C11.1324 22 12.5466 22 15.375 22L16.375 22C19.2034 22 20.6176 22 21.4963 21.1213C22.375 20.2426 22.375 18.8284 22.375 16L22.375 8C22.375 5.17158 22.375 3.75736 21.4963 2.87868C20.6176 2 19.2034 2 16.375 2L15.375 2C12.5466 2 11.1324 2 10.2537 2.87868C9.375 3.75736 9.375 5.17157 9.375 8L9.375 9.75004Z" fill="#FFFFFF"></path>
-                            </g>
-                        </svg>
-                    </a>
-                {% endif %}
-            </div>
-        </div>
-
-        <div class="container d-none d-sm-block text-center text-white">
-            Copyright 2024
-        </div>
-    </footer>
+    {% include "components/footer/footer.html.twig" %}
 
 </body>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>

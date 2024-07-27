@@ -36,7 +36,8 @@ class TrickController extends AbstractController
         private readonly Filesystem             $filesystem,
         private readonly PictureService $pictureService,
         private readonly CsrfTokenManagerInterface $csrfTokenManager,
-        private readonly VideoRepository $videoRepository
+        private readonly VideoRepository $videoRepository,
+        private readonly LoggerInterface $logger
     ) {}
 
     #[Route('/tricks', name: 'tricks')]
@@ -242,13 +243,9 @@ class TrickController extends AbstractController
             return new JsonResponse(['error' => 'ID invalide'], 400);
         }
 
-        // Debug: Vérifiez l'ID
-        error_log("ID reçu pour suppression : " . $id);
-
         $image = $this->imageRepository->find($id);
 
         if (!$image) {
-            error_log("Image non trouvée avec l'ID : " . $id);
             return new JsonResponse(['error' => 'Image non trouvée'], 404);
         }
 
@@ -268,7 +265,8 @@ class TrickController extends AbstractController
                 return new JsonResponse(['error' => 'Erreur de suppression'], 400);
             }
         } catch (\Exception $e) {
-            return new JsonResponse(['error' => 'Erreur de suppression: ' . $e->getMessage()], 500);
+            $this->logger->error('Erreur de suppression: ' . $e->getMessage());
+            return new JsonResponse(['error' => 'Erreur de suppression'], 500);
         }
     }
 
