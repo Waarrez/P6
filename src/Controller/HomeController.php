@@ -22,7 +22,7 @@ class HomeController extends AbstractController
     )
     {}
 
-    #[Route('/', name: 'home.index')]
+    #[Route('/', name: 'home.index', methods: ['GET'])]
     public function index(): Response
     {
         $tricks = $this->trickRepository->findAll();

@@ -121,7 +121,8 @@
             {{ form_widget(form.images, { 'attr': {'class': 'form-control' } }) }}
         </div>
 
-        <div class="container d-flex justify-content-center align-items-center mt-5 mb-5">
+        <div class="container d-flex justify-content-center align-items-center mt-5 mb-5 gap-3">
+            <button data-trick="{{ trick.id }}" type="submit" class="btn btn-danger confirmationButton">Supprimer</button>
             <button type="submit" class="btn btn-primary">Sauvegarder</button>
         </div>
 
@@ -131,6 +132,19 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="module">
         $(document).ready(function() {
+            let confirmationButtons = document.querySelectorAll(".confirmationButton");
+
+            confirmationButtons.forEach(function(confirmationButton) {
+                confirmationButton.addEventListener("click", function(event) {
+                    event.preventDefault();
+                    const confirmation = confirm("Êtes-vous sûr de supprimer cette figure ?");
+                    if (confirmation) {
+                        const idTrick = confirmationButton.getAttribute('data-trick');
+                        window.location.href = "/trick/remove/" + idTrick;
+                    }
+                });
+            });
+
             let index = 0;
 
             $('#add-video-btn').click(function() {

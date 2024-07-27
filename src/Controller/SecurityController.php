@@ -31,7 +31,7 @@ class SecurityController extends AbstractController
     )
     {}
 
-    #[Route(path: '/login', name: 'app_login')]
+    #[Route(path: '/login', name: 'app_login', methods: ['GET'])]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
         if ($this->getUser() instanceof \Symfony\Component\Security\Core\User\UserInterface) {
@@ -46,7 +46,7 @@ class SecurityController extends AbstractController
         return $this->render('security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);
     }
 
-    #[Route(path: '/logout', name: 'app_logout')]
+    #[Route(path: '/logout', name: 'app_logout', methods: ['GET'])]
     public function logout(): void
     {
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
@@ -55,7 +55,7 @@ class SecurityController extends AbstractController
     /**
      * @throws TransportExceptionInterface
      */
-    #[Route('/register', name: 'home.register')]
+    #[Route('/register', name: 'home.register', methods: ['GET', 'POST'])]
     public function register(Request $request, EntityManagerInterface $entityManager): Response
     {
         if ($this->getUser() instanceof User) {
@@ -118,7 +118,7 @@ class SecurityController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/confirmAccount/{token}', name: 'app_confirm_account')]
+    #[Route(path: '/confirmAccount/{token}', name: 'app_confirm_account', methods: ['GET', 'POST'])]
     public function confirmAccount(string $token): ?Response
     {
         if ($token === '' || $token === '0') {
@@ -145,7 +145,7 @@ class SecurityController extends AbstractController
      * @throws Exception
      * @throws TransportExceptionInterface
      */
-    #[Route("/resetPassword", name: "home.resetPassword")]
+    #[Route("/resetPassword", name: "home.resetPassword", methods: ['GET', 'POST'])]
     public function sendResetPassword(Request $request, SessionInterface $session): Response
     {
         $email = $request->request->get('email', '');
@@ -189,7 +189,7 @@ class SecurityController extends AbstractController
         ]);
     }
 
-    #[Route("/confirmCode", name: "home.confirmCode")]
+    #[Route("/confirmCode", name: "home.confirmCode", methods: ['GET', 'POST'])]
     public function confirmCode(SessionInterface $session, Request $request) : Response {
 
        if ($session->get('code') !== "") {
@@ -213,7 +213,7 @@ class SecurityController extends AbstractController
         return $this->render('account/confirmResetPassword.html.twig');
     }
 
-    #[Route("/newPassword", name: "home.newPassword")]
+    #[Route("/newPassword", name: "home.newPassword", methods: ['GET', 'POST'])]
     public function addNewPassword(Request $request, SessionInterface $session) : Response {
 
         if ($session->get('code') === true) {

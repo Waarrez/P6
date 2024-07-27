@@ -40,7 +40,7 @@ class TrickController extends AbstractController
         private readonly LoggerInterface $logger
     ) {}
 
-    #[Route('/tricks', name: 'tricks')]
+    #[Route('/tricks', name: 'tricks', methods: ['GET'])]
     public function tricks(): Response
     {
         $tricks = $this->trickRepository->findAll();
@@ -50,7 +50,7 @@ class TrickController extends AbstractController
         ]);
     }
 
-    #[Route('/addTrick', name: 'addTrick')]
+    #[Route('/addTrick', name: 'addTrick', methods: ['GET', 'POST'])]
     public function addTrick(Request $request): Response
     {
         $trick = new Trick();
@@ -69,7 +69,7 @@ class TrickController extends AbstractController
     /**
      * @throws NonUniqueResultException
      */
-    #[Route('/trick/detail/{slug}', name: "home.viewTrick")]
+    #[Route('/trick/detail/{slug}', name: "home.viewTrick", methods: ['GET'])]
     public function viewTrick(string $slug): Response
     {
         $trick = $this->trickRepository->getTrickBySlug($slug);
@@ -90,7 +90,7 @@ class TrickController extends AbstractController
     /**
      * @throws NonUniqueResultException
      */
-    #[Route('/trick/edit/{slug}', name: "editTrick")]
+    #[Route('/trick/edit/{slug}', name: "editTrick", methods: ['GET', 'POST'])]
     public function editTrick(string $slug, Request $request): Response
     {
         $trick = $this->trickRepository->getTrickBySlug($slug);
@@ -115,7 +115,7 @@ class TrickController extends AbstractController
         ]);
     }
 
-    #[Route('/trick/remove/{id}', name: "deleteTrick")]
+    #[Route('/trick/remove/{id}', name: "deleteTrick", methods: ['DELETE'])]
     public function deleteTrick(string $id): Response
     {
         $trick = $this->trickRepository->find($id);
