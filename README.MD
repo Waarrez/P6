@@ -8,13 +8,15 @@
 
 - Télécharger le projet avec la commande : ``` git clone https://github.com/Waarrez/P6.git ```
 - Dans le dossier du projet et faire la commande suivante : ``` composer install ```
+
 - Insérer le fichier snowtricks.sql qui se trouve dans le dossier sql dans phpmyadmin
+- Ensuite fait un copier coller du .env et renommer le en .env.local et connecter votre BDD avec cette ligne ! ``` DATABASE_URL=mysql://root:@localhost:3306/P6?charset=utf8mb4 ```
 - Démarrer le serveur avec la commande suivante : ``` symfony serve -d ```
 - Suivez les étapes si dessous
 
 ## Serveur MAIL
 - Pour bien recevoir les mails vous devrez exécuter cette commande: ``` php bin/console messenger:consume async --time-limit=3600 ```
-- Et mettre dans le .env.local (faite un copier collé du .env) que vous devrez créer cette ligne : ``` MAILER_DSN=gmail://email:password@smtp.gmail.com: ```
+- Et mettre dans le .env.local cette ligne : ``` MAILER_DSN=gmail://email:password@smtp.gmail.com: ```
 - Pour des raisons de sécurités je vous laisse insérer votre email ainsi que le mot de passe d'application disponible sur votre compte google.
 
 ## INSCRIPTION
