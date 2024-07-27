@@ -36,13 +36,11 @@ class TrickController extends AbstractController
         private readonly Filesystem             $filesystem,
         private readonly PictureService $pictureService,
         private readonly CsrfTokenManagerInterface $csrfTokenManager,
-        private readonly VideoRepository $videoRepository
+        private readonly VideoRepository $videoRepository,
+        private readonly LoggerInterface $logger
     ) {}
 
-    /**
-     * @return Response
-     */
-    #[Route('/tricks', name: 'tricks')]
+    #[Route('/tricks', name: 'tricks', methods: ['GET'])]
     public function tricks(): Response
     {
         $tricks = $this->trickRepository->findAll();
@@ -52,11 +50,7 @@ class TrickController extends AbstractController
         ]);
     }
 
-    /**
-     * @param Request $request
-     * @return Response
-     */
-    #[Route('/addTrick', name: 'addTrick')]
+    #[Route('/addTrick', name: 'addTrick', methods: ['GET', 'POST'])]
     public function addTrick(Request $request): Response
     {
         $trick = new Trick();
@@ -73,19 +67,18 @@ class TrickController extends AbstractController
     }
 
     /**
-     * @param string $slug
-     * @return Response
      * @throws NonUniqueResultException
      */
-    #[Route('/trick/detail/{slug}', name: "home.viewTrick")]
+    #[Route('/trick/detail/{slug}', name: "home.viewTrick", methods: ['GET'])]
     public function viewTrick(string $slug): Response
     {
         $trick = $this->trickRepository->getTrickBySlug($slug);
 
-        if($trick->getComments() && $trick) {
-            $comments = $trick->getComments();
+        if ($trick instanceof \App\Entity\Trick) {
+            $comments = $trick->getComments() ?? [];
         } else {
-            $comments = [];
+            $this->addFlash('error', "La figure n'a pas été trouvé !");
+            return $this->redirectToRoute('tricks');
         }
 
         return $this->render('tricks/view_trick.html.twig', [
@@ -95,12 +88,9 @@ class TrickController extends AbstractController
     }
 
     /**
-     * @param string $slug
-     * @param Request $request
-     * @return Response
      * @throws NonUniqueResultException
      */
-    #[Route('/trick/edit/{slug}', name: "editTrick")]
+    #[Route('/trick/edit/{slug}', name: "editTrick", methods: ['GET', 'POST'])]
     public function editTrick(string $slug, Request $request): Response
     {
         $trick = $this->trickRepository->getTrickBySlug($slug);
@@ -113,7 +103,7 @@ class TrickController extends AbstractController
 
         $form = $this->trickHandler->prepare($trick);
 
-        if ($this->trickHandler->handle($form, $request, $trick, $this->getParameter("upload_directory"))) {
+        if ($this->trickHandler->handle($form, $request, $trick, $this->getParameter("upload_directory"), true)) {
             $this->addFlash("success", "La figure à bien été modifié !");
             return $this->redirectToRoute('tricks');
         }
@@ -125,11 +115,7 @@ class TrickController extends AbstractController
         ]);
     }
 
-    /**
-     * @param string $id
-     * @return Response
-     */
-    #[Route('/trick/remove/{id}', name: "deleteTrick")]
+    #[Route('/trick/remove/{id}', name: "deleteTrick", methods: ['GET'])]
     public function deleteTrick(string $id): Response
     {
         $trick = $this->trickRepository->find($id);
@@ -149,6 +135,12 @@ class TrickController extends AbstractController
         $uploadDirectory = $this->getParameter('upload_directory');
         $imagePath = $uploadDirectory . '/' . $trick->getImages();
 
+        foreach ($trick->getSecondaryImages() as $secondary) {
+            $this->pictureService->delete($secondary->getName(), 'tricksImg', 300, 200);
+
+            $this->entityManager->remove($secondary);
+        }
+
         if ($this->filesystem->exists($imagePath)) {
             try {
                 $this->filesystem->remove($imagePath);
@@ -166,8 +158,6 @@ class TrickController extends AbstractController
     }
 
     /**
-     * @param Request $request
-     * @return JsonResponse
      * @throws NonUniqueResultException
      */
     public function addComment(Request $request): JsonResponse
@@ -178,7 +168,7 @@ class TrickController extends AbstractController
         $slug = $request->request->get('slug');
         $trick = $this->trickRepository->getTrickBySlug($slug);
 
-        if (!$trick) {
+        if (!$trick instanceof \App\Entity\Trick) {
             return new JsonResponse([
                 'message' => 'Trick non trouvé',
             ], 404);
@@ -207,16 +197,39 @@ class TrickController extends AbstractController
 
         return new JsonResponse([
             'message' => 'Commentaire ajouté avec succès',
+            'success' => true,
             'comments' => $updatedComments,
         ]);
     }
 
-    /**
-     * @param string $id
-     * @param Request $request
-     * @param PictureService $pictureService
-     * @return JsonResponse
-     */
+    #[Route('/trick/removePrimaryImage/{name}', name: "deletePrimaryImage", methods: ['DELETE'])]
+    public function deletePrimaryImage(string $name): Response
+    {
+        if ($name === '' || $name === '0') {
+            return $this->json(['success' => false, 'error' => 'Le nom de l\'image est manquant.']);
+        }
+
+        $data = $this->trickRepository->findOneBy(['images' => $name]);
+
+        if (!$data) {
+            return $this->json(['success' => false, 'error' => 'Image non trouvée.']);
+        }
+
+        $existingImagePath = $this->getParameter('upload_directory') . '/' . $data->getImages();
+        if (file_exists($existingImagePath)) {
+            unlink($existingImagePath);
+        }
+
+        $data->setImages('');
+        $this->entityManager->persist($data);
+        $this->entityManager->flush();
+
+        return $this->json([
+            'success' => true,
+            'redirect' => $this->generateUrl('editTrick', ['slug' => $data->getSlug()])
+        ]);
+    }
+
     #[Route('/trick/removeImage/{id}', name: "deleteImage", methods: ['DELETE'])]
     public function deleteImage(string $id, Request $request, PictureService $pictureService): JsonResponse
     {
@@ -226,7 +239,6 @@ class TrickController extends AbstractController
             return new JsonResponse(['error' => 'Token non fourni'], 400);
         }
 
-        // Validation de l'ID
         if (!preg_match('/^[a-zA-Z0-9\-]+$/', $id)) {
             return new JsonResponse(['error' => 'ID invalide'], 400);
         }
@@ -248,18 +260,18 @@ class TrickController extends AbstractController
             if ($this->pictureService->delete($name, 'tricksImg', 300, 200)) {
                 $this->entityManager->remove($image);
                 $this->entityManager->flush();
-
                 return new JsonResponse(['success' => 'Image supprimée'], 200);
             } else {
                 return new JsonResponse(['error' => 'Erreur de suppression'], 400);
             }
         } catch (\Exception $e) {
-            return new JsonResponse(['error' => 'Erreur de suppression: ' . $e->getMessage()], 500);
+            $this->logger->error('Erreur de suppression: ' . $e->getMessage());
+            return new JsonResponse(['error' => 'Erreur de suppression'], 500);
         }
     }
 
     #[Route('/trick/removeVideo/{id}', name: "deleteVideo", methods: ['DELETE'])]
-    public function deleteVideo(string $id, Request $request, VideoRepository $videoRepository, EntityManagerInterface $entityManager, CsrfTokenManagerInterface $csrfTokenManager): JsonResponse
+    public function deleteVideo(string $id, Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -267,16 +279,17 @@ class TrickController extends AbstractController
             return new JsonResponse(['error' => 'Token non fourni'], 400);
         }
 
-        $token = $data['_token'];
-        if (!$this->csrfTokenManager->isTokenValid(new CsrfToken('delete' . $id, $token))) {
+        $csrfToken = new CsrfToken('delete' . $id, $data['_token']);
+        if (!$this->csrfTokenManager->isTokenValid($csrfToken)) {
             return new JsonResponse(['error' => 'Token invalide'], 403);
         }
 
-        // Validation de l'ID
+        // Validate ID format
         if (!preg_match('/^[a-zA-Z0-9\-]+$/', $id)) {
             return new JsonResponse(['error' => 'ID invalide'], 400);
         }
 
+        // Use Doctrine to find and remove the video
         $video = $this->videoRepository->find($id);
 
         if (!$video) {

@@ -9,6 +9,7 @@ usecase "Supprimer un trick" as UC_Delete
 usecase "Voir un trick" as UC_View
 usecase "Commenter un trick" as UC_Comment
 usecase "Ajouter une image à un trick" as UC_AddImage
+usecase "Ajouter une vidéo à un trick" as UC_AddVideo
 usecase "Se connecter" as UC_Login
 usecase "Authentification requise" as UC_AuthRequired
 
@@ -17,16 +18,18 @@ User --> UC_View
 
 Guest --> UC_Login
 
-UC_Create .> UC_AuthRequired : <<extends>>
-UC_Edit .> UC_AuthRequired : <<extends>>
-UC_Delete .> UC_AuthRequired : <<extends>>
-UC_Comment .> UC_AuthRequired : <<extends>>
-UC_AddImage .> UC_AuthRequired : <<extends>>
+UC_Create .> UC_Login : <<extends>>
+UC_Edit .> UC_Login : <<extends>>
+UC_Delete .> UC_Login : <<extends>>
+UC_Comment .> UC_Login : <<extends>>
+UC_AddImage .> UC_Login : <<extends>>
+UC_AddVideo .> UC_Login : <<extends>>
 
 User --> UC_Create
 User --> UC_Edit
 User --> UC_Delete
 User --> UC_Comment
 User --> UC_AddImage
+User --> UC_AddVideo
 
 @enduml

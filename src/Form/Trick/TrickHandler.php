@@ -4,8 +4,9 @@ namespace App\Form\Trick;
 
 use App\Entity\Trick;
 use App\Entity\Image;
-use App\Entity\Video;
 use App\Services\PictureService;
+use Doctrine\DBAL\Exception\DriverException;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -17,16 +18,8 @@ use Symfony\Component\String\Slugger\AsciiSlugger;
 
 final class TrickHandler
 {
-    private RequestStack $requestStack;
-
-    public function __construct(
-        private readonly FormFactoryInterface $formFactory,
-        private readonly EntityManagerInterface $entityManager,
-        private readonly PictureService $pictureService,
-        RequestStack $requestStack
-    )
+    public function __construct(private readonly FormFactoryInterface $formFactory, private readonly EntityManagerInterface $entityManager, private readonly PictureService $pictureService, private RequestStack $requestStack)
     {
-        $this->requestStack = $requestStack;
     }
 
     /**
@@ -38,14 +31,6 @@ final class TrickHandler
         return $this->formFactory->create(TrickFormType::class, $data, $options);
     }
 
-    /**
-     * @param FormInterface $form
-     * @param Request $request
-     * @param Trick $trick
-     * @param string $upload_directory
-     * @param bool $isEdit
-     * @return bool
-     */
     public function handle(FormInterface $form, Request $request, Trick $trick, string $upload_directory, bool $isEdit = false): bool
     {
         $form->handleRequest($request);
@@ -53,20 +38,34 @@ final class TrickHandler
         if ($form->isSubmitted() && $form->isValid()) {
             $file = $form->get('imageFile')->getData();
             $files = $form->get('images')->getData();
-            $newVideos = [
-                $form->get('newVideo')->getData(),
-                $form->get('newVideo2')->getData(),
-                $form->get('newVideo3')->getData()
-            ];
+            $secondaryPictures = $form->get('secondaryImages')->getData();
 
             $name = $form->get('name')->getData();
             $slug = $this->setSlugForName($name);
             $trick->setSlug($slug);
 
-            if (count($files) >= 4) {
-                $session = $this->requestStack->getSession();
-                $session->getFlashBag()->add('error', 'Vous ne pouvez mettre que 3 images');
-                return false;
+            foreach ($secondaryPictures as $secondary) {
+                if ($secondary->getFile() !== null) {
+                    foreach ($trick->getSecondaryImages() as $img) {
+                        if ($secondary->getName() === $img->getName()) {
+                            $newFileName = $this->pictureService->add($secondary->getFile(), '', 300, 200);
+                            try {
+                                $this->pictureService->delete($img->getName(), 'tricksImg', 300, 200);
+
+                                $this->entityManager->remove($img);
+
+                                $image = new Image();
+                                $image->setTricks($trick)
+                                    ->setName($newFileName);
+
+                                $trick->addSecondaryImage($image);
+                                $this->entityManager->persist($image);
+                            } catch (FileException $e) {
+                                error_log($e->getMessage());
+                            }
+                        }
+                    }
+                }
             }
 
             foreach ($files as $imageForm) {
@@ -87,9 +86,10 @@ final class TrickHandler
             if ($file !== null) {
                 $existingImage = $trick->getImages();
 
-                if ($existingImage !== null) {
+                if ($existingImage !== null && $existingImage !== '' && $existingImage !== '0') {
                     $existingImagePath = $upload_directory . '/' . $existingImage;
-                    if (file_exists($existingImagePath)) {
+
+                    if (file_exists($existingImagePath) && is_file($existingImagePath)) {
                         unlink($existingImagePath);
                     }
                 }
@@ -98,22 +98,9 @@ final class TrickHandler
 
                 try {
                     $file->move($upload_directory, $newFileName);
+                    $trick->setImages($newFileName);
                 } catch (FileException $e) {
                     error_log($e->getMessage());
-                }
-
-                $trick->setImages($newFileName);
-            }
-
-            // Ajouter les vidéos
-            foreach ($newVideos as $videoUrl) {
-                if ($videoUrl) { // Assurez-vous que l'URL de la vidéo n'est pas vide
-                    $video = new Video();
-                    $video->setTricks($trick)
-                        ->setUrl($videoUrl);
-
-                    $trick->addVideo($video);
-                    $this->entityManager->persist($video);
                 }
             }
 
@@ -126,8 +113,23 @@ final class TrickHandler
                 $trick->setCreatedAt(new \DateTimeImmutable());
             }
 
-            $this->entityManager->persist($trick);
-            $this->entityManager->flush();
+            try {
+                $this->entityManager->persist($trick);
+                $this->entityManager->flush();
+            } catch (UniqueConstraintViolationException $e) {
+                $this->requestStack->getSession()->getFlashBag()->add('error', 'Un trick avec ce nom existe déjà.');
+                error_log('UniqueConstraintViolationException: ' . $e->getMessage());
+                return false;
+            } catch (DriverException $e) {
+                // Catch database related exceptions
+                error_log('DriverException: ' . $e->getMessage());
+                $this->requestStack->getSession()->getFlashBag()->add('error', 'Erreur de base de données.');
+                return false;
+            } catch (\Exception $e) {
+                error_log('Exception: ' . $e->getMessage());
+                $this->requestStack->getSession()->getFlashBag()->add('error', 'Erreur inconnue lors de la sauvegarde du trick.');
+                return false;
+            }
 
             return true;
         }
@@ -135,10 +137,7 @@ final class TrickHandler
         return false;
     }
 
-    /**
-     * @param string $slug
-     * @return AbstractUnicodeString
-     */
+
     private function setSlugForName(string $slug): AbstractUnicodeString
     {
         $slugger = new AsciiSlugger();

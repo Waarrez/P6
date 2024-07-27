@@ -31,11 +31,7 @@ class SecurityController extends AbstractController
     )
     {}
 
-    /**
-     * @param AuthenticationUtils $authenticationUtils
-     * @return Response
-     */
-    #[Route(path: '/login', name: 'app_login')]
+    #[Route(path: '/login', name: 'app_login', methods: ['GET', 'POST'])]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
         if ($this->getUser() instanceof \Symfony\Component\Security\Core\User\UserInterface) {
@@ -50,19 +46,16 @@ class SecurityController extends AbstractController
         return $this->render('security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);
     }
 
-    #[Route(path: '/logout', name: 'app_logout')]
+    #[Route(path: '/logout', name: 'app_logout', methods: ['GET'])]
     public function logout(): void
     {
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
 
     /**
-     * @param Request $request
-     * @param EntityManagerInterface $entityManager
-     * @return Response
      * @throws TransportExceptionInterface
      */
-    #[Route('/register', name: 'home.register')]
+    #[Route('/register', name: 'home.register', methods: ['GET', 'POST'])]
     public function register(Request $request, EntityManagerInterface $entityManager): Response
     {
         if ($this->getUser() instanceof User) {
@@ -113,7 +106,7 @@ class SecurityController extends AbstractController
                 } else {
                     $this->addFlash('error', 'Une erreur est survenue. Veuillez réessayer.');
                 }
-            } catch (Exception $e) {
+            } catch (Exception) {
                 $this->addFlash('error', "Une erreur est survenue lors de votre inscription. Veuillez réessayer.");
             }
         } else {
@@ -125,11 +118,7 @@ class SecurityController extends AbstractController
         ]);
     }
 
-    /**
-     * @param string $token
-     * @return Response|null
-     */
-    #[Route(path: '/confirmAccount/{token}', name: 'app_confirm_account')]
+    #[Route(path: '/confirmAccount/{token}', name: 'app_confirm_account', methods: ['GET', 'POST'])]
     public function confirmAccount(string $token): ?Response
     {
         if ($token === '' || $token === '0') {
@@ -138,7 +127,7 @@ class SecurityController extends AbstractController
 
         $user = $this->userRepository->findOneBy(["confirmAccount" => $token]);
 
-        if ($user === true) {
+        if ($user === null) {
             $this->addFlash("error", "Le lien n'est plus disponible.");
             return $this->redirectToRoute('home.index');
         }
@@ -156,7 +145,7 @@ class SecurityController extends AbstractController
      * @throws Exception
      * @throws TransportExceptionInterface
      */
-    #[Route("/resetPassword", name: "home.resetPassword")]
+    #[Route("/resetPassword", name: "home.resetPassword", methods: ['GET', 'POST'])]
     public function sendResetPassword(Request $request, SessionInterface $session): Response
     {
         $email = $request->request->get('email', '');
@@ -200,7 +189,7 @@ class SecurityController extends AbstractController
         ]);
     }
 
-    #[Route("/confirmCode", name: "home.confirmCode")]
+    #[Route("/confirmCode", name: "home.confirmCode", methods: ['GET', 'POST'])]
     public function confirmCode(SessionInterface $session, Request $request) : Response {
 
        if ($session->get('code') !== "") {
@@ -224,11 +213,11 @@ class SecurityController extends AbstractController
         return $this->render('account/confirmResetPassword.html.twig');
     }
 
-    #[Route("/newPassword", name: "home.newPassword")]
+    #[Route("/newPassword", name: "home.newPassword", methods: ['GET', 'POST'])]
     public function addNewPassword(Request $request, SessionInterface $session) : Response {
 
         if ($session->get('code') === true) {
-            if ($request->isMethod("POST") === true) {
+            if ($request->isMethod("POST")) {
                 $password = $request->request->get('password');
 
                 $email = $session->get('email');

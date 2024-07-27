@@ -1,0 +1,52 @@
+@startuml
+actor Utilisateur
+
+participant "SecurityController" as Controleur
+participant "UserService" as ServiceUtilisateur
+participant "UserRepository" as Repo
+participant "EmailService" as ServiceEmail
+participant "Redirect" as Redirection
+
+Utilisateur -> Controleur: Accède à la page d'inscription
+Controleur -> Utilisateur: Affiche le formulaire d'inscription
+
+Utilisateur -> Controleur: Soumet les informations d'inscription (nom, mot de passe, photo de profil, email)
+Controleur -> ServiceUtilisateur: Enregistrer les informations de l'utilisateur (nom, mot de passe, photo de profil, email)
+
+alt Email valide
+    ServiceUtilisateur -> Repo: Vérifier si le nom d'utilisateur est disponible
+    Repo -> ServiceUtilisateur: Nom d'utilisateur disponible
+    ServiceUtilisateur -> Repo: Vérifier si l'email est déjà utilisé
+    Repo -> ServiceUtilisateur: Email disponible
+    ServiceUtilisateur -> Repo: Enregistrer l'utilisateur dans la base de données
+    Repo -> ServiceUtilisateur: Utilisateur enregistré
+    ServiceUtilisateur -> ServiceEmail: Envoyer email de confirmation
+    ServiceEmail -> Utilisateur: Envoyer email avec lien de confirmation
+
+    alt Email envoyé avec succès
+        ServiceEmail -> Controleur: Confirmation d'envoi de l'email
+        Controleur -> Redirection: Rediriger vers la page de confirmation
+        Redirection -> Utilisateur: Afficher message de confirmation (vérifiez votre email)
+    else Échec d'envoi d'email
+        ServiceEmail -> Controleur: Erreur d'envoi d'email
+        Controleur -> Utilisateur: Afficher message d'erreur (échec d'envoi de l'email)
+    end
+
+else Email invalide
+    ServiceUtilisateur -> Controleur: Email invalide
+    Controleur -> Utilisateur: Afficher message d'erreur (email invalide)
+end
+
+alt Email déjà utilisé
+    Repo -> ServiceUtilisateur: Email déjà utilisé
+    ServiceUtilisateur -> Controleur: Erreur de disponibilité de l'email
+    Controleur -> Utilisateur: Afficher message d'erreur (email déjà utilisé)
+end
+
+alt Nom d'utilisateur déjà utilisé
+    Repo -> ServiceUtilisateur: Nom d'utilisateur déjà pris
+    ServiceUtilisateur -> Controleur: Erreur de disponibilité du nom d'utilisateur
+    Controleur -> Utilisateur: Afficher message d'erreur (nom d'utilisateur déjà utilisé)
+end
+
+@enduml

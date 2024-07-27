@@ -9,14 +9,10 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class PictureService
 {
-    private ParameterBagInterface $params;
-    private LoggerInterface $logger;
-
-    public function __construct(ParameterBagInterface $params, LoggerInterface $logger)
+    public function __construct(private ParameterBagInterface $params, private LoggerInterface $logger)
     {
-        $this->params = $params;
-        $this->logger = $logger;
     }
+
     public function add(UploadedFile $picture, ?string $folder = '', ?int $width = 250, ?int $height = 250): string
     {
         $fichier = md5(uniqid(rand(), true)) . '.webp';
@@ -87,12 +83,12 @@ class PictureService
         $mini = $path . '/tricksImg/' . $width . 'x' . $height . '-' . $fichier;
         $original = $path . '/' . $fichier;
 
-        $this->logger->info('Mini file path for deletion:', ['path' => $mini]);
+        $this->logger->info('File path for deletion:', ['path' => $mini]);
         if (file_exists($mini)) {
             unlink($mini);
             $success = true;
         } else {
-            $this->logger->warning('Mini file not found:', ['file' => $mini]);
+            $this->logger->warning('File not found:', ['file' => $mini]);
         }
 
         $this->logger->info('Original file path for deletion:', ['path' => $original]);

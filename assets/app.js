@@ -7,5 +7,4 @@
 
 // any CSS you import will output into a single css file (app.css in this case)
 import './styles/app.css';
-import './js/add-comment'
-import './js/image'
+import './js/scripts'

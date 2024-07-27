@@ -21,7 +21,7 @@ class Trick
     #[Groups("tricks")]
     private ?string $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     #[Groups("tricks")]
     private ?string $name = null;
 
@@ -29,7 +29,7 @@ class Trick
     #[Groups("tricks")]
     private ?string $content = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     #[Groups("tricks")]
     private ?string $images = null;
 
@@ -60,7 +60,7 @@ class Trick
     /**
      * @var Collection<int, Image>
      */
-    #[ORM\OneToMany(mappedBy: 'tricks', targetEntity: Image::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'tricks', targetEntity: Image::class, cascade: ["persist", "remove"], orphanRemoval: true)]
     private Collection $secondaryImages;
 
     /**
@@ -224,11 +224,9 @@ class Trick
 
     public function removeSecondaryImage(Image $secondaryImage): self
     {
-        if ($this->secondaryImages->removeElement($secondaryImage)) {
-            // set the owning side to null (unless already changed)
-            if ($secondaryImage->getTricks() === $this) {
-                $secondaryImage->setTricks(null);
-            }
+        // set the owning side to null (unless already changed)
+        if ($this->secondaryImages->removeElement($secondaryImage) && $secondaryImage->getTricks() === $this) {
+            $secondaryImage->setTricks(null);
         }
 
         return $this;
@@ -254,11 +252,9 @@ class Trick
 
     public function removeVideo(Video $video): static
     {
-        if ($this->videos->removeElement($video)) {
-            // set the owning side to null (unless already changed)
-            if ($video->getTricks() === $this) {
-                $video->setTricks(null);
-            }
+        // set the owning side to null (unless already changed)
+        if ($this->videos->removeElement($video) && $video->getTricks() === $this) {
+            $video->setTricks(null);
         }
 
         return $this;

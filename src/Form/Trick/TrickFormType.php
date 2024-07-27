@@ -4,7 +4,7 @@ namespace App\Form\Trick;
 
 use App\Entity\Group;
 use App\Entity\Trick;
-use App\Form\ImagesType;
+use App\Form\ImageType;
 use App\Form\VideoType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -40,6 +40,7 @@ class TrickFormType extends AbstractType
                         'mimeTypes' => [
                             'image/jpeg',
                             'image/png',
+                            'image/webp'
                         ],
                         'mimeTypesMessage' => 'Veuillez télécharger une image valide (JPEG, PNG).',
                     ]),
@@ -51,29 +52,13 @@ class TrickFormType extends AbstractType
                 'required' => false,
                 'label' => false,
             ])
-            ->add('newVideo', TextType::class, [
-                'label' => false,
-                'mapped' => false,
+            ->add('secondaryImages', CollectionType::class, [
+                'entry_type' => ImageType::class,
+                'allow_add' => true,
+                'allow_delete' => true,
+                'by_reference' => false,
                 'required' => false,
-                'attr' => [
-                    'placeholder' => 'Ajouter une nouvelle vidéo'
-                ]
-            ])
-            ->add('newVideo2', TextType::class, [
                 'label' => false,
-                'mapped' => false,
-                'required' => false,
-                'attr' => [
-                    'placeholder' => 'Ajouter une nouvelle vidéo'
-                ]
-            ])
-            ->add('newVideo3', TextType::class, [
-                'label' => false,
-                'mapped' => false,
-                'required' => false,
-                'attr' => [
-                    'placeholder' => 'Ajouter une nouvelle vidéo'
-                ]
             ])
             ->add('videos', CollectionType::class, [
                 'entry_type' => VideoType::class,
@@ -82,7 +67,6 @@ class TrickFormType extends AbstractType
                 'allow_delete' => true,
                 'by_reference' => false,
             ]);
-        ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
