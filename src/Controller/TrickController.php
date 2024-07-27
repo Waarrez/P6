@@ -281,13 +281,15 @@ class TrickController extends AbstractController
 
         $csrfToken = new CsrfToken('delete' . $id, $data['_token']);
         if (!$this->csrfTokenManager->isTokenValid($csrfToken)) {
-            return new JsonResponse(['error' => 'Token invalide'], 400);
+            return new JsonResponse(['error' => 'Token invalide'], 403);
         }
 
+        // Validate ID format
         if (!preg_match('/^[a-zA-Z0-9\-]+$/', $id)) {
             return new JsonResponse(['error' => 'ID invalide'], 400);
         }
 
+        // Use Doctrine to find and remove the video
         $video = $this->videoRepository->find($id);
 
         if (!$video) {
@@ -303,5 +305,4 @@ class TrickController extends AbstractController
             return new JsonResponse(['error' => 'Erreur de suppression: ' . $e->getMessage()], 500);
         }
     }
-
 }
