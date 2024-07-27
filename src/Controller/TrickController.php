@@ -303,4 +303,5 @@ class TrickController extends AbstractController
             return new JsonResponse(['error' => 'Erreur de suppression: ' . $e->getMessage()], 500);
         }
     }
+
 }
