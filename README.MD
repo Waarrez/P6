@@ -11,6 +11,7 @@
 
 - Insérer le fichier snowtricks.sql qui se trouve dans le dossier sql dans phpmyadmin
 - Ensuite fait un copier coller du .env et renommer le en .env.local et connecter votre BDD avec cette ligne ! ``` DATABASE_URL=mysql://root:@localhost:3306/P6?charset=utf8mb4 ```
+- Importer ensuite la structure de base de donnée en faisant ``` php bin/console d:m:m --no-interaction ```
 - Démarrer le serveur avec la commande suivante : ``` symfony serve -d ```
 - Suivez les étapes si dessous
 
