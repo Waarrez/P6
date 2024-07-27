@@ -37,12 +37,17 @@
                 {% set totalCount = videoCount + imageCount %}
 
                 {% set columnClass = 'col-12 col-sm-6' %}
-                {% if totalCount == 2 and videoCount == 1 and imageCount == 1 or totalCount == 1 and videoCount == 0 and imageCount == 1 or totalCount == 1 and videoCount == 0 and imageCount == 1  %}
+
+                {% if (totalCount == 2 and videoCount == 1 and imageCount == 1)
+                    or (totalCount == 1 and videoCount == 1 and imageCount == 0)
+                    or (totalCount == 1 and videoCount == 0 and imageCount == 1) %}
+                    {% set columnClass = 'col-12 col-md-6' %}
+                {% elseif imageCount == 1 %}
                     {% set columnClass = 'col-12 col-md-12' %}
-                    {% elseif totalCount == 2 and videoCount == 2 %}
-                        {% set columnClass = 'col-12 col-md-6' %}
-                    {% elseif totalCount == 2 and imageCount == 2 %}
-                        {% set columnClass = 'col-12 col-md-6' %}
+                {% elseif totalCount == 2 and videoCount == 2 %}
+                    {% set columnClass = 'col-12 col-md-6' %}
+                {% elseif totalCount == 2 and imageCount == 2 %}
+                    {% set columnClass = 'col-12 col-md-6' %}
                 {% else %}
                     {% set columnClass = 'col-12 col-md-4' %}
                 {% endif %}
@@ -54,6 +59,7 @@
                 {% for image in trick.secondaryImages %}
                     {% set mediaItems = mediaItems|merge([{'type': 'image', 'name': image.name}]) %}
                 {% endfor %}
+
 
                 {% for media in mediaItems %}
                     <div class="{{ columnClass }} mb-3 d-flex justify-content-center">

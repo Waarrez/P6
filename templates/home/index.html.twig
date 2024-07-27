@@ -110,15 +110,6 @@
                     $(this).hide();
                 }
             });
-
-            $(document).on("click", ".confirmationButton", function(event) {
-                event.preventDefault();
-                const confirmation = confirm("Êtes-vous sûr de supprimer cette figure ?");
-                if (confirmation) {
-                    const idTrick = $(this).data('trick');
-                    window.location.href = "/trick/remove/" + idTrick;
-                }
-            });
         });
     </script>
 {% endblock %}

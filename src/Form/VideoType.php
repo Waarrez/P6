@@ -18,7 +18,8 @@ class VideoType extends AbstractType
             ->add('url', TextType::class, [
                 'label' => false,
                 'attr' => [
-                    'class' => 'form-control'
+                    'class' => 'form-control',
+                    'placeholder' => "Format de la vidéo : https://www.youtube.com/embed/idVideo"
                 ],
             ]);
     }

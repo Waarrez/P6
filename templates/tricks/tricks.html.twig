@@ -80,29 +80,4 @@
             display: none;
         }
     </style>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            let confirmationButtons = document.querySelectorAll(".confirmationButton");
-
-            confirmationButtons.forEach(function(confirmationButton) {
-                confirmationButton.addEventListener("click", function(event) {
-                    event.preventDefault();
-                    const confirmation = confirm("Êtes-vous sûr de supprimer cette figure ?");
-                    if (confirmation) {
-                        const idTrick = confirmationButton.getAttribute('data-trick');
-                        window.location.href = "/trick/remove/" + idTrick;
-                    }
-                });
-            });
-
-            let showAll = document.getElementById("card");
-            let buttonShow = document.getElementById("showMoreTrick");
-
-            buttonShow.addEventListener('click', () => {
-                showAll.removeAttribute("id");
-                buttonShow.classList.add("noneButton");
-            });
-        });
-    </script>
 {% endblock %}
