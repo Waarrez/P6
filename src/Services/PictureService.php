@@ -9,13 +9,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class PictureService
 {
-    private ParameterBagInterface $params;
-    private LoggerInterface $logger;
-
-    public function __construct(ParameterBagInterface $params, LoggerInterface $logger)
+    public function __construct(private ParameterBagInterface $params, private LoggerInterface $logger)
     {
-        $this->params = $params;
-        $this->logger = $logger;
     }
 
     public function add(UploadedFile $picture, ?string $folder = '', ?int $width = 250, ?int $height = 250): string

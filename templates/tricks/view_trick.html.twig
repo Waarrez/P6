@@ -35,8 +35,12 @@
                 {% set totalCount = videoCount + imageCount %}
 
                 {% set columnClass = 'col-12 col-sm-6' %}
-                {% if totalCount == 2 and videoCount == 1 and imageCount == 1 %}
-                    {% set columnClass = 'col-12 col-md-6' %}
+                {% if totalCount == 2 and videoCount == 1 and imageCount == 1 or totalCount == 1 and videoCount == 0 and imageCount == 1 or totalCount == 1 and videoCount == 0 and imageCount == 1  %}
+                    {% set columnClass = 'col-12 col-md-12' %}
+                    {% elseif totalCount == 2 and videoCount == 2 %}
+                        {% set columnClass = 'col-12 col-md-6' %}
+                    {% elseif totalCount == 2 and imageCount == 2 %}
+                        {% set columnClass = 'col-12 col-md-6' %}
                 {% else %}
                     {% set columnClass = 'col-12 col-md-4' %}
                 {% endif %}

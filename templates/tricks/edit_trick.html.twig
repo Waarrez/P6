@@ -13,8 +13,6 @@
     <form action="{{ path('editTrick', {'slug': trick.slug}) }}" method="post" enctype="multipart/form-data">
         {{ form_start(form) }}
 
-        {{ form_widget(form.name, {'attr' : { 'style' : 'display : none;' }}) }}
-
         <div class="text-center" style="position: relative;">
             <div class="bg-dark rounded p-2" style="position: absolute; top: 10px; right: 20px">
                 <a style="margin-right: 10px" href="#" id="svgTrigger">
@@ -30,7 +28,9 @@
                     </a>
                 {% endif %}
             </div>
-            <h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold bg-dark p-3 rounded">{{ trick.name }}</h1>
+            <h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold bg-dark p-3 rounded">
+                {{ form_widget(form.name, {'attr' : {'class' : 'form-control'}}) }}
+            </h1>
             <img class="trick-main-image" style="width: 100%; height: auto; max-height: 70vh; object-fit: cover;" src="{{ asset('uploads/' ~ trick.images) }}" alt="Trick Image" onerror="this.src='{{ asset('img/noi_image.jpg') }}'">
         </div>
 
@@ -93,7 +93,7 @@
             </div>
         </div>
 
-        <div class="form-group mt-5 container text-center">
+        <div class="container-fluid mt-5  text-center">
             <label for="trick_videos">Ajouter une vidéo :</label>
             <ul class="videos" data-prototype="{{ form_widget(form.videos.vars.prototype)|e }}">
             </ul>
@@ -131,16 +131,28 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="module">
         $(document).ready(function() {
-            let $list = $('.videos');
-            let index = $('.d-flex.flex-column.align-items-center', '.d-flex.flex-row.flex-wrap').length;
+            let index = 0;
 
             $('#add-video-btn').click(function() {
+                let $list = $('.videos');
+
                 let prototype = $list.data('prototype');
                 let newForm = prototype.replace(/__name__/g, index);
                 let $newLi = $('<li class="d-flex flex-column align-items-center mt-3"></li>').html(newForm);
                 $list.append($newLi);
+                addRemoveButton($newLi);
                 index++;
             });
+
+            function addRemoveButton($formLi) {
+                let $removeButton = $('<button type="button" class="btn btn-danger mt-5 mb-5">Supprimer cette vidéo</button>');
+                $formLi.append($removeButton);
+
+                $removeButton.on('click', function(e) {
+                    e.preventDefault();
+                    $formLi.remove();
+                });
+            }
 
 
             $('#svgTrigger').on('click', function(event) {

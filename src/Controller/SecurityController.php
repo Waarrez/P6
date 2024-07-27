@@ -31,10 +31,6 @@ class SecurityController extends AbstractController
     )
     {}
 
-    /**
-     * @param AuthenticationUtils $authenticationUtils
-     * @return Response
-     */
     #[Route(path: '/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
@@ -57,9 +53,6 @@ class SecurityController extends AbstractController
     }
 
     /**
-     * @param Request $request
-     * @param EntityManagerInterface $entityManager
-     * @return Response
      * @throws TransportExceptionInterface
      */
     #[Route('/register', name: 'home.register')]
@@ -113,7 +106,7 @@ class SecurityController extends AbstractController
                 } else {
                     $this->addFlash('error', 'Une erreur est survenue. Veuillez réessayer.');
                 }
-            } catch (Exception $e) {
+            } catch (Exception) {
                 $this->addFlash('error', "Une erreur est survenue lors de votre inscription. Veuillez réessayer.");
             }
         } else {
@@ -125,10 +118,6 @@ class SecurityController extends AbstractController
         ]);
     }
 
-    /**
-     * @param string $token
-     * @return Response|null
-     */
     #[Route(path: '/confirmAccount/{token}', name: 'app_confirm_account')]
     public function confirmAccount(string $token): ?Response
     {
@@ -228,7 +217,7 @@ class SecurityController extends AbstractController
     public function addNewPassword(Request $request, SessionInterface $session) : Response {
 
         if ($session->get('code') === true) {
-            if ($request->isMethod("POST") === true) {
+            if ($request->isMethod("POST")) {
                 $password = $request->request->get('password');
 
                 $email = $session->get('email');

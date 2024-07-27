@@ -39,9 +39,6 @@ class TrickController extends AbstractController
         private readonly VideoRepository $videoRepository
     ) {}
 
-    /**
-     * @return Response
-     */
     #[Route('/tricks', name: 'tricks')]
     public function tricks(): Response
     {
@@ -52,10 +49,6 @@ class TrickController extends AbstractController
         ]);
     }
 
-    /**
-     * @param Request $request
-     * @return Response
-     */
     #[Route('/addTrick', name: 'addTrick')]
     public function addTrick(Request $request): Response
     {
@@ -73,8 +66,6 @@ class TrickController extends AbstractController
     }
 
     /**
-     * @param string $slug
-     * @return Response
      * @throws NonUniqueResultException
      */
     #[Route('/trick/detail/{slug}', name: "home.viewTrick")]
@@ -82,7 +73,7 @@ class TrickController extends AbstractController
     {
         $trick = $this->trickRepository->getTrickBySlug($slug);
 
-        if ($trick !== null) {
+        if ($trick instanceof \App\Entity\Trick) {
             $comments = $trick->getComments() ?? [];
         } else {
             $this->addFlash('error', "La figure n'a pas été trouvé !");
@@ -96,9 +87,6 @@ class TrickController extends AbstractController
     }
 
     /**
-     * @param string $slug
-     * @param Request $request
-     * @return Response
      * @throws NonUniqueResultException
      */
     #[Route('/trick/edit/{slug}', name: "editTrick")]
@@ -126,10 +114,6 @@ class TrickController extends AbstractController
         ]);
     }
 
-    /**
-     * @param string $id
-     * @return Response
-     */
     #[Route('/trick/remove/{id}', name: "deleteTrick")]
     public function deleteTrick(string $id): Response
     {
@@ -150,6 +134,12 @@ class TrickController extends AbstractController
         $uploadDirectory = $this->getParameter('upload_directory');
         $imagePath = $uploadDirectory . '/' . $trick->getImages();
 
+        foreach ($trick->getSecondaryImages() as $secondary) {
+            $this->pictureService->delete($secondary->getName(), 'tricksImg', 300, 200);
+
+            $this->entityManager->remove($secondary);
+        }
+
         if ($this->filesystem->exists($imagePath)) {
             try {
                 $this->filesystem->remove($imagePath);
@@ -167,8 +157,6 @@ class TrickController extends AbstractController
     }
 
     /**
-     * @param Request $request
-     * @return JsonResponse
      * @throws NonUniqueResultException
      */
     public function addComment(Request $request): JsonResponse
@@ -179,7 +167,7 @@ class TrickController extends AbstractController
         $slug = $request->request->get('slug');
         $trick = $this->trickRepository->getTrickBySlug($slug);
 
-        if (!$trick) {
+        if (!$trick instanceof \App\Entity\Trick) {
             return new JsonResponse([
                 'message' => 'Trick non trouvé',
             ], 404);
@@ -216,7 +204,7 @@ class TrickController extends AbstractController
     #[Route('/trick/removePrimaryImage/{name}', name: "deletePrimaryImage", methods: ['DELETE'])]
     public function deletePrimaryImage(string $name): Response
     {
-        if (empty($name)) {
+        if ($name === '' || $name === '0') {
             return $this->json(['success' => false, 'error' => 'Le nom de l\'image est manquant.']);
         }
 
@@ -241,12 +229,6 @@ class TrickController extends AbstractController
         ]);
     }
 
-    /**
-     * @param string $id
-     * @param Request $request
-     * @param PictureService $pictureService
-     * @return JsonResponse
-     */
     #[Route('/trick/removeImage/{id}', name: "deleteImage", methods: ['DELETE'])]
     public function deleteImage(string $id, Request $request, PictureService $pictureService): JsonResponse
     {

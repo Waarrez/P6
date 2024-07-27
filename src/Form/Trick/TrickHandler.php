@@ -18,16 +18,8 @@ use Symfony\Component\String\Slugger\AsciiSlugger;
 
 final class TrickHandler
 {
-    private RequestStack $requestStack;
-
-    public function __construct(
-        private readonly FormFactoryInterface $formFactory,
-        private readonly EntityManagerInterface $entityManager,
-        private readonly PictureService $pictureService,
-        RequestStack $requestStack
-    )
+    public function __construct(private readonly FormFactoryInterface $formFactory, private readonly EntityManagerInterface $entityManager, private readonly PictureService $pictureService, private RequestStack $requestStack)
     {
-        $this->requestStack = $requestStack;
     }
 
     /**
@@ -39,14 +31,6 @@ final class TrickHandler
         return $this->formFactory->create(TrickFormType::class, $data, $options);
     }
 
-    /**
-     * @param FormInterface $form
-     * @param Request $request
-     * @param Trick $trick
-     * @param string $upload_directory
-     * @param bool $isEdit
-     * @return bool
-     */
     public function handle(FormInterface $form, Request $request, Trick $trick, string $upload_directory, bool $isEdit = false): bool
     {
         $form->handleRequest($request);
@@ -70,15 +54,12 @@ final class TrickHandler
 
                                 $this->entityManager->remove($img);
 
-                                $this->entityManager->flush();
-
                                 $image = new Image();
                                 $image->setTricks($trick)
                                     ->setName($newFileName);
 
                                 $trick->addSecondaryImage($image);
                                 $this->entityManager->persist($image);
-                                $this->entityManager->flush();
                             } catch (FileException $e) {
                                 error_log($e->getMessage());
                             }
@@ -105,7 +86,7 @@ final class TrickHandler
             if ($file !== null) {
                 $existingImage = $trick->getImages();
 
-                if (!empty($existingImage)) {
+                if ($existingImage !== null && $existingImage !== '' && $existingImage !== '0') {
                     $existingImagePath = $upload_directory . '/' . $existingImage;
 
                     if (file_exists($existingImagePath) && is_file($existingImagePath)) {
@@ -157,10 +138,6 @@ final class TrickHandler
     }
 
 
-    /**
-     * @param string $slug
-     * @return AbstractUnicodeString
-     */
     private function setSlugForName(string $slug): AbstractUnicodeString
     {
         $slugger = new AsciiSlugger();
