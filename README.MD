@@ -24,4 +24,5 @@
 
 [![PHP Version](https://img.shields.io/badge/php-8.0-blue)](https://www.php.net/releases/8.0/en.php)
 ![Composer Version](https://img.shields.io/badge/Composer-2.6.6-blue)
+[![Maintainability](https://api.codeclimate.com/v1/badges/79025237c78b49081758/maintainability)](https://codeclimate.com/github/Waarrez/P6/maintainability)
 
