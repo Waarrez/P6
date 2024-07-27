@@ -115,7 +115,7 @@ class TrickController extends AbstractController
         ]);
     }
 
-    #[Route('/trick/remove/{id}', name: "deleteTrick", methods: ['DELETE'])]
+    #[Route('/trick/remove/{id}', name: "deleteTrick", methods: ['GET'])]
     public function deleteTrick(string $id): Response
     {
         $trick = $this->trickRepository->find($id);

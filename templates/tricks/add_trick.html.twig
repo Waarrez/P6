@@ -54,47 +54,5 @@
         <button class="btn btn-primary mt-5" type="submit">Ajouter</button>
 
         {{ form_end(form) }}
-
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script type="module">
-            $(document).ready(function() {
-                let $collectionHolder = $('ul.videos');
-                let $addVideoButton = $('#add-video-btn');
-                let prototype = $collectionHolder.data('prototype');
-                let index = $collectionHolder.find('li').length;
-
-                $collectionHolder.data('index', index);
-
-                $addVideoButton.on('click', function(e) {
-                    e.preventDefault();
-                    addVideoForm($collectionHolder, $addVideoButton);
-                });
-
-                function addVideoForm($collectionHolder, $addVideoButton) {
-                    let prototype = $collectionHolder.data('prototype');
-                    let index = $collectionHolder.data('index');
-                    let newForm = prototype.replace(/__name__/g, index);
-                    $collectionHolder.data('index', index + 1);
-
-                    let $newFormLi = $('<li></li>').append(newForm);
-                    addRemoveButton($newFormLi);
-                    $addVideoButton.before($newFormLi);
-                }
-
-                function addRemoveButton($formLi) {
-                    let $removeButton = $('<button type="button" class="btn btn-danger mt-5 mb-5">Supprimer cette vidéo</button>');
-                    $formLi.append($removeButton);
-
-                    $removeButton.on('click', function(e) {
-                        e.preventDefault();
-                        $formLi.remove();
-                    });
-                }
-
-                $collectionHolder.find('li').each(function() {
-                    addRemoveButton($(this));
-                });
-            });
-        </script>
     </div>
 {% endblock %}

@@ -141,15 +141,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
-            $(".confirmationButton").on("click", function(event) {
-                event.preventDefault();
-                const confirmation = confirm("Êtes-vous sûr de supprimer cette figure ?");
-                if (confirmation) {
-                    const idTrick = $(this).data('trick');
-                    window.location.href = "/trick/remove/" + idTrick;
-                }
-            });
-
             $('#showMediaBtn').on('click', function() {
                 let $mediaContainer = $('#mediaContainer');
 
@@ -162,10 +153,7 @@
                 }
             });
 
-            $("#loadMoreComments").on("click", function() {
-                $(".comment.hidden-comment").removeClass("hidden-comment");
-                $("#loadMoreContainer").hide();
-            });
+
         });
     </script>
 {% endblock %}

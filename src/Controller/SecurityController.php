@@ -31,7 +31,7 @@ class SecurityController extends AbstractController
     )
     {}
 
-    #[Route(path: '/login', name: 'app_login', methods: ['GET'])]
+    #[Route(path: '/login', name: 'app_login', methods: ['GET', 'POST'])]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
         if ($this->getUser() instanceof \Symfony\Component\Security\Core\User\UserInterface) {
