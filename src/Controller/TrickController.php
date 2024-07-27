@@ -279,9 +279,9 @@ class TrickController extends AbstractController
             return new JsonResponse(['error' => 'Token non fourni'], 400);
         }
 
-        $token = $data['_token'];
-        if (!$this->csrfTokenManager->isTokenValid(new CsrfToken('delete' . $id, $token))) {
-            return new JsonResponse(['error' => 'Token invalide'], 403);
+        $csrfToken = new CsrfToken('delete' . $id, $data['_token']);
+        if (!$this->csrfTokenManager->isTokenValid($csrfToken)) {
+            return new JsonResponse(['error' => 'Token invalide'], 400);
         }
 
         if (!preg_match('/^[a-zA-Z0-9\-]+$/', $id)) {
