@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3307
--- Généré le : ven. 12 juil. 2024 à 19:08
+-- Généré le : sam. 27 juil. 2024 à 15:48
 -- Version du serveur : 10.6.5-MariaDB
 -- Version de PHP : 8.2.0
 
@@ -39,19 +39,6 @@ CREATE TABLE IF NOT EXISTS `comment` (
   KEY `IDX_9474526C67B3B43D` (`users_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Déchargement des données de la table `comment`
---
-
-INSERT INTO `comment` (`id`, `trick_id`, `content`, `users_id`, `created_at`) VALUES
-('01J2BSX5X8MT28EECK3Y7FZGES', '01J1SRX33011SGWH2VHZ09S3F7', 'Très belle figure', '01J29DF4VEXP32D4XMFM495DEC', '2024-07-09 13:11:11'),
-('01J2K2HBH7HT4GBREPHTN47AJ1', '01J1SRX33011SGWH2VHZ09S3F7', 'Développeur web', '01J29DF4VEXP32D4XMFM495DEC', '2024-07-12 08:56:42'),
-('01J2K7390JRFSVHC3MJDZKGYG0', '01J1SRX33011SGWH2VHZ09S3F7', 'Test', '01J29DF4VEXP32D4XMFM495DEC', '2024-07-12 10:16:23'),
-('01J2K73BCZ00NWSQBBWPNTW5WE', '01J1SRX33011SGWH2VHZ09S3F7', 'Test commentaire', '01J29DF4VEXP32D4XMFM495DEC', '2024-07-12 10:16:26'),
-('01J2K7XS9ZJTSY4H0SAGG68J0P', '01J1SRX33011SGWH2VHZ09S3F7', 'Très belle figure', '01J29DF4VEXP32D4XMFM495DEC', '2024-07-12 10:30:52'),
-('01J2M51BA1HRN6JQ1TGTYVVZ8S', '01J1SRX33011SGWH2VHZ09S3F7', 'Développeur web', '01J29DF4VEXP32D4XMFM495DEC', '2024-07-12 18:59:37'),
-('01J2M57JR5K5MAR90466B3NBD6', '01J1SRX33011SGWH2VHZ09S3F7', 'Test', '01J29DF4VEXP32D4XMFM495DEC', '2024-07-12 19:03:02');
-
 -- --------------------------------------------------------
 
 --
@@ -79,7 +66,18 @@ INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_
 ('DoctrineMigrations\\Version20240702121051', '2024-07-02 12:11:06', 52),
 ('DoctrineMigrations\\Version20240708085624', '2024-07-08 08:56:50', 61),
 ('DoctrineMigrations\\Version20240708115315', '2024-07-08 11:53:24', 41),
-('DoctrineMigrations\\Version20240709123521', '2024-07-09 12:36:03', 249);
+('DoctrineMigrations\\Version20240709123521', '2024-07-09 12:36:03', 249),
+('DoctrineMigrations\\Version20240714101846', '2024-07-20 14:59:11', 297),
+('DoctrineMigrations\\Version20240717165150', '2024-07-20 14:59:12', 149),
+('DoctrineMigrations\\Version20240717165616', '2024-07-20 14:59:12', 288),
+('DoctrineMigrations\\Version20240717165831', '2024-07-20 14:59:12', 159),
+('DoctrineMigrations\\Version20240717170053', '2024-07-20 14:59:12', 182),
+('DoctrineMigrations\\Version20240717170149', '2024-07-20 14:59:13', 154),
+('DoctrineMigrations\\Version20240722075249', '2024-07-22 07:53:01', 184),
+('DoctrineMigrations\\Version20240722075646', '2024-07-22 07:56:52', 40),
+('DoctrineMigrations\\Version20240722080952', '2024-07-22 08:09:55', 45),
+('DoctrineMigrations\\Version20240726073051', '2024-07-26 07:30:58', 74),
+('DoctrineMigrations\\Version20240726075522', '2024-07-26 07:55:26', 118);
 
 -- --------------------------------------------------------
 
@@ -107,17 +105,25 @@ INSERT INTO `group` (`id`, `name`) VALUES
 -- --------------------------------------------------------
 
 --
--- Structure de la table `images`
+-- Structure de la table `image`
 --
 
-DROP TABLE IF EXISTS `images`;
-CREATE TABLE IF NOT EXISTS `images` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `tricks_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+DROP TABLE IF EXISTS `image`;
+CREATE TABLE IF NOT EXISTS `image` (
+  `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tricks_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `IDX_E01FBE6A3B153154` (`tricks_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `IDX_C53D045F3B153154` (`tricks_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `image`
+--
+
+INSERT INTO `image` (`id`, `tricks_id`, `name`) VALUES
+('01J3TDSBJ1K072ASS0DWVSH9K7', '01J3TCRA93ZMV49BKNK0EPHMC2', 'af9e33d19a47c16df803898fd6027043.webp'),
+('01J3TDXTYWQ2P45Y1G20J9XS1N', '01J3TCRA93ZMV49BKNK0EPHMC2', '02895a960ded06799cac13cf8f4bf8fa.webp');
 
 -- --------------------------------------------------------
 
@@ -138,7 +144,7 @@ CREATE TABLE IF NOT EXISTS `messenger_messages` (
   KEY `IDX_75EA56E0FB7336F0` (`queue_name`),
   KEY `IDX_75EA56E0E3BD61CE` (`available_at`),
   KEY `IDX_75EA56E016BA31DB` (`delivered_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -152,12 +158,12 @@ CREATE TABLE IF NOT EXISTS `trick` (
   `groups_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `content` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `images` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `medias` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `images` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)',
   `edit_at` datetime DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)',
   `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `UNIQ_D8F0A91E5E237E06` (`name`),
   KEY `IDX_D8F0A91EF373DCF` (`groups_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -165,16 +171,16 @@ CREATE TABLE IF NOT EXISTS `trick` (
 -- Déchargement des données de la table `trick`
 --
 
-INSERT INTO `trick` (`id`, `groups_id`, `name`, `content`, `images`, `medias`, `created_at`, `edit_at`, `slug`) VALUES
-('01J1SRX33011SGWH2VHZ09S3F7', '01J1SRRRZK2X4H82E7KY1KKHDY', 'Mute', 'Saisie de la carre frontside de la planche entre les deux pieds avec la main avant.', '6683fb884f96a.jpg', 'https://www.youtube.com/embed/PFMzcvcowC4', '2024-07-02 13:07:20', '2024-07-02 15:59:09', 'Mute'),
-('01J2K4FA2B3NV51293ZMBS4DYK', '01J1SRRRZK2X4H82E7KY1KKHDY', 'Sad', 'Saisie de la carre backside de la planche, entre les deux pieds, avec la main avant.', '6690f7b873fda.jpg', 'https://www.youtube.com/embed/KEdFwJ4SWq4', '2024-07-12 09:30:32', NULL, 'Sad'),
-('01J2K4NZ1RQWT51W54N9DC3V7T', '01J1SRRRZK2X4H82E7KY1KKHDY', 'Indy', 'Saisie de la carre frontside de la planche, entre les deux pieds, avec la main arrière.', '6690f892822ef.jpg', 'https://www.youtube.com/embed/6yA3XqjTh_w', '2024-07-12 09:34:10', NULL, 'Indy'),
-('01J2K5F1WFX2YB1Q3N52M0NZ3K', '01J1SRRRZK2X4H82E7KY1KKHDY', 'Stalefish', 'Saisie de la carre backside de la planche entre les deux pieds avec la main arrière.', '6690fbc89affb.jpg', 'https://www.youtube.com/embed/f9FjhCt_w2U', '2024-07-12 09:47:52', NULL, 'Stalefish'),
-('01J2K5N1BSFEBXPG313PQ175EE', '01J1SRRRZK2X4H82E7KY1KKHDY', 'Tail grab', 'Saisie de la partie arrière de la planche, avec la main arrière.', '6690fc8cabb9c.jpg', 'https://www.youtube.com/embed/_Qq-YoXwNQY', '2024-07-12 09:51:08', NULL, 'Tail-grab'),
-('01J2K5QM476JBZW0DMDHWXGB59', '01J1SRRRZK2X4H82E7KY1KKHDY', 'Nose grab', 'Saisie de la partie avant de la planche, avec la main avant.', '6690fce1700e2.jpg', 'https://www.youtube.com/embed/M-W7Pmo-YMY', '2024-07-12 09:52:33', NULL, 'Nose-grab'),
-('01J2K5YCPEYQZ3GYNCRY3MM8Z3', '01J1SRRRZK2X4H82E7KY1KKHDY', 'Japan air', 'Saisie de l\'avant de la planche, avec la main avant, du côté de la carre frontside.', '6690fdbf39009.jpg', 'https://www.youtube.com/embed/jH76540wSqU', '2024-07-12 09:56:15', NULL, 'Japan-air'),
-('01J2K60Z4SYJ5JFM4DY55TFSM6', '01J1SRRRZK2X4H82E7KY1KKHDY', 'Seat belt', 'Saisie du carre frontside à l\'arrière avec la main avant.', '6690fe139e091.jpg', 'https://www.youtube.com/embed/4vGEOYNGi_c', '2024-07-12 09:57:39', NULL, 'Seat-belt'),
-('01J2K65KT4GSMGPVKD82ERMD8S', '01J1SRRRZK2X4H82E7KY1KKHDY', 'Truck driver', 'Saisie du carre avant et carre arrière avec chaque main (comme tenir un volant de voiture).', '6690feabd7c53.jpg', 'https://www.youtube.com/embed/mslkQJbORDM', '2024-07-12 10:00:11', NULL, 'Truck-driver');
+INSERT INTO `trick` (`id`, `groups_id`, `name`, `content`, `images`, `created_at`, `edit_at`, `slug`) VALUES
+('01J3TCRA93ZMV49BKNK0EPHMC2', '01J1SRRB9QTANJ8ES3G6EK8DPM', 'Mute', 'Saisie de la carre frontside de la planche entre les deux pieds avec la main avant.', '66a5117305fde.jpg', '2024-07-27 15:25:39', '2024-07-27 15:46:57', 'Mute'),
+('01J3TCTM25VBA4WP36007HTTZ0', '01J1SRRRZK2X4H82E7KY1KKHDY', 'Sad', 'Saisie de la carre backside de la planche, entre les deux pieds, avec la main avant.', '66a511be8ce62.jpg', '2024-07-27 15:26:54', NULL, 'Sad'),
+('01J3TCXSQAVX33R714FTP5PW0E', '01J1SRRRZK2X4H82E7KY1KKHDY', 'Indy', 'Saisie de la carre frontside de la planche, entre les deux pieds, avec la main arrière.', '66a51226a5e2c.jpg', '2024-07-27 15:28:38', NULL, 'Indy'),
+('01J3TCYJH792YD7ET5GK56JRDP', '01J1SRRRZK2X4H82E7KY1KKHDY', 'Stalefish', 'Saisie de la carre backside de la planche entre les deux pieds avec la main arrière', '66a512bbe3ecd.jpg', '2024-07-27 15:29:04', '2024-07-27 15:31:07', 'Stalefish'),
+('01J3TCZ28BSQWYK6V339EMP4PK', '01J1SRRRZK2X4H82E7KY1KKHDY', 'Tail grab', 'Saisie de la partie arrière de la planche, avec la main arrière;', '66a512d7a24fe.webp', '2024-07-27 15:29:20', '2024-07-27 15:31:35', 'Tail-grab'),
+('01J3TCZFBPZC33ZHPXC0QN5ZGZ', '01J1SRRRZK2X4H82E7KY1KKHDY', 'Nose grab', 'Saisie de la partie avant de la planche, avec la main avant', '66a512efdc51e.webp', '2024-07-27 15:29:33', '2024-07-27 15:31:59', 'Nose-grab'),
+('01J3TD02E2MGHB617BQ0TWFSKG', '01J1SRRRZK2X4H82E7KY1KKHDY', 'Japan Air', 'Saisie de l\'avant de la planche, avec la main avant, du côté de la carre frontside.', '66a5133abd614.jpg', '2024-07-27 15:29:53', '2024-07-27 15:33:14', 'Japan-Air'),
+('01J3TD0TKXSTZX287HC3TVSAN4', '01J1SRRRZK2X4H82E7KY1KKHDY', 'Seat belt', 'Saisie du carre frontside à l\'arrière avec la main avant', '66a513b0ee10c.jpg', '2024-07-27 15:30:17', '2024-07-27 15:35:12', 'Seat-belt'),
+('01J3TD1FQHHMZP8HF9J4MA120S', '01J1SRRRZK2X4H82E7KY1KKHDY', 'Truck driver', 'Saisie du carre avant et carre arrière avec chaque main (comme tenir un volant de voiture).', '66a513d1310e0.jpg', '2024-07-27 15:30:39', '2024-07-27 15:35:45', 'Truck-driver');
 
 -- --------------------------------------------------------
 
@@ -186,7 +192,7 @@ DROP TABLE IF EXISTS `user`;
 CREATE TABLE IF NOT EXISTS `user` (
   `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `username` varchar(180) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `roles` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '(DC2Type:json)' CHECK (json_valid(`roles`)),
+  `roles` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`roles`)),
   `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `confirm_account` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -201,8 +207,37 @@ CREATE TABLE IF NOT EXISTS `user` (
 --
 
 INSERT INTO `user` (`id`, `username`, `roles`, `password`, `email`, `confirm_account`, `user_picture`) VALUES
-('01J29DF4VEXP32D4XMFM495DEC', 'Warez', '[]', '$2y$13$/eOa1nBdIyItjuuEdKAXfOiGhdlFv5.m37rfceT.7Hkh/GZFA6owS', 'thimote.cabotte6259@gmail.com', '', '668bfdd80a656.jpg'),
-('01J29G4ES9657ZEYH3BPEDC3SQ', 'Zitrox', '[]', '$2y$13$4PxPo/sC01gOLbW8JDEoOOVoazMFoqoOMu1WpLVkFjjZevcHHN9rS', 'zitroxofficiel@gmail.com', '', '');
+('01J29DF4VEXP32D4XMFM495DEC', 'Warez', '[]', '$2y$13$OiVhjh34tS9qcNcXrmk9/eCDkU7k5r4Yd8EPdVvDUusxW3vHkWWbe', 'thimote.cabotte6259@gmail.com', '', '668bfdd80a656.jpg');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `video`
+--
+
+DROP TABLE IF EXISTS `video`;
+CREATE TABLE IF NOT EXISTS `video` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tricks_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `url` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `IDX_7CC7DA2C3B153154` (`tricks_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=87 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `video`
+--
+
+INSERT INTO `video` (`id`, `tricks_id`, `url`) VALUES
+(45, '01J2K60Z4SYJ5JFM4DY55TFSM6', 'https://www.youtube.com/watch?v=jWmfT-qjm2Y&t=2015s'),
+(46, '01J2K60Z4SYJ5JFM4DY55TFSM6', 'https://www.youtube.com/embed/mBB7CznvSPQ'),
+(49, '01J2K65KT4GSMGPVKD82ERMD8S', 'https://www.youtube.com/embed/mBB7CznvSPQ'),
+(53, '01J2K4NZ1RQWT51W54N9DC3V7T', 'https://www.youtube.com/embed/mBB7CznvSPQ'),
+(54, '01J2K65KT4GSMGPVKD82ERMD8S', 'https://www.youtube.com/embed/mBB7CznvSPQ'),
+(77, '01J2K4NZ1RQWT51W54N9DC3V7T', 'https://www.youtube.com/embed/axbLC9PqzfE'),
+(81, '01J3TCTM25VBA4WP36007HTTZ0', 'https://www.youtube.com/embed/KEdFwJ4SWq4'),
+(82, '01J3TCXSQAVX33R714FTP5PW0E', 'https://www.youtube.com/embed/6yA3XqjTh_w'),
+(86, '01J3TCRA93ZMV49BKNK0EPHMC2', 'https://www.youtube.com/embed/wWmqtgDutls');
 
 --
 -- Contraintes pour les tables déchargées
@@ -216,16 +251,22 @@ ALTER TABLE `comment`
   ADD CONSTRAINT `FK_9474526CB281BE2E` FOREIGN KEY (`trick_id`) REFERENCES `trick` (`id`);
 
 --
--- Contraintes pour la table `images`
+-- Contraintes pour la table `image`
 --
-ALTER TABLE `images`
-  ADD CONSTRAINT `FK_E01FBE6A3B153154` FOREIGN KEY (`tricks_id`) REFERENCES `trick` (`id`);
+ALTER TABLE `image`
+  ADD CONSTRAINT `FK_C53D045F3B153154` FOREIGN KEY (`tricks_id`) REFERENCES `trick` (`id`);
 
 --
 -- Contraintes pour la table `trick`
 --
 ALTER TABLE `trick`
   ADD CONSTRAINT `FK_D8F0A91EF373DCF` FOREIGN KEY (`groups_id`) REFERENCES `group` (`id`);
+
+--
+-- Contraintes pour la table `video`
+--
+ALTER TABLE `video`
+  ADD CONSTRAINT `FK_7CC7DA2C3B153154` FOREIGN KEY (`tricks_id`) REFERENCES `trick` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
